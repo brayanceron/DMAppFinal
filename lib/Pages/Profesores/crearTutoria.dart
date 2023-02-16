@@ -13,7 +13,7 @@ class crearTutoria extends StatefulWidget {
 class _crearTutoriaState extends State<crearTutoria> {
   Map argumentosRecividos = new Map();
   String id_usuario="";
-
+  String URL="http://10.0.2.2:8000";
 
   TextEditingController nombre = new TextEditingController();
   TextEditingController descripcion = new TextEditingController();
@@ -63,7 +63,7 @@ class _crearTutoriaState extends State<crearTutoria> {
 
 registrarTutoria(){
 
-  var url = Uri.parse("http://192.168.1.57:8000/registrarTutoria/");
+  var url = Uri.parse(URL+"/registrarTutoria/");
   print("n="+nombre.text+" d="+descripcion.text);
   
   http.post(url, body: jsonEncode({"nombre":nombre.text,"id_profesor":id_usuario,"descripcion":descripcion.text}))

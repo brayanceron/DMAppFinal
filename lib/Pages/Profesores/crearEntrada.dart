@@ -15,6 +15,7 @@ class _crearEntradaState extends State<crearEntrada> {
   Map argumentosRecividos = new Map();
   String id_usuario_profesor="";
   String id_tutoria="";
+  String URL="http://10.0.2.2:8000";
 
   TextEditingController tituloControlador = new TextEditingController();
   TextEditingController descripcionControlador = new TextEditingController();
@@ -67,7 +68,7 @@ class _crearEntradaState extends State<crearEntrada> {
 
 
 registrarEntrada(){
-  var url = Uri.parse("http://192.168.1.57:8000/registrarEntrada/");
+  var url = Uri.parse(URL+"/registrarEntrada/");
   //print("titulo="+tituloControlador.text+" desc="+descripcionControlador.text+" prof:"+id_usuario_profesor+" tutoria:"+id_tutoria);
   
   http.post(url, body: jsonEncode({"titulo":tituloControlador.text,'id_tutoria':id_tutoria,

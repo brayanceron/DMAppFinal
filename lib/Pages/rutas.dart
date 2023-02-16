@@ -11,6 +11,7 @@ class Rutas extends StatefulWidget {
 }
 
 class _RutasState extends State<Rutas> {
+  String URL="http://192.168.1.57:8000";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,7 +106,7 @@ class _RutasState extends State<Rutas> {
   }
 
   void peticionGet() {
-    var url = Uri.parse("http://192.168.1.57:8000/rutaUno/");
+    var url = Uri.parse(URL+"/rutaUno/");
 
     http.get(url).then((res) {
       var datarecived = jsonDecode(res.body);
@@ -114,7 +115,7 @@ class _RutasState extends State<Rutas> {
   }
 
   void peticionPost() {
-    var url = Uri.parse("http://192.168.1.57:8000/rutaUno/");
+    var url = Uri.parse(URL+"/rutaUno/");
     var datasend =  jsonEncode({"datos_peticion": "Brayan OK", "atributo2": "valor2"});
     http.post(url, body: datasend).then((res) {
       print("Peticion recivida: " + res.body);

@@ -10,6 +10,7 @@ class panelTutoria extends StatefulWidget {
 }
 
 class _panelTutoriaState extends State<panelTutoria> {
+  String URL="http://10.0.2.2:8000";
   String id_tutoria = "";
   String id_usuario = "";
   String rol_usuario = "";
@@ -130,7 +131,7 @@ class _panelTutoriaState extends State<panelTutoria> {
     
     print("--->" + id_tutoria);
 
-    var url = Uri.parse("http://192.168.1.57:8000/getContenidoTutoria/");
+    var url = Uri.parse(URL+"/getContenidoTutoria/");
 
     final res = await http.post(url, body: jsonEncode({"id_tutoria": this.id_tutoria}));
     var datarecived = jsonDecode(res.body);

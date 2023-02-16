@@ -16,6 +16,8 @@ class _getEntradaState extends State<getEntrada> {
   String rol_usuario = "";
   List entrada = [];
 
+  String URL="http://10.0.2.2:8000";
+
   Map argumentosRecividos = new Map();
 
 
@@ -66,7 +68,7 @@ class _getEntradaState extends State<getEntrada> {
     
     print("--->" + id_tutoria);
 
-    var url = Uri.parse("http://192.168.1.57:8000/getEntrada/");
+    var url = Uri.parse(URL+"/getEntrada/");
 
     final res = await http.post(url, body: jsonEncode({"id_entrada": this.id_entrada}));
     var datarecived = jsonDecode(res.body);

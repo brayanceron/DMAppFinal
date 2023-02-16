@@ -17,6 +17,7 @@ class _detalleTutoriaState extends State<detalleTutoria> {
   String id_usuario = "";
   String rol_usuario = "";
   List tutoria = [];
+  String URL="http://10.0.2.2:8000";
 
   Map argumentosRecividos = new Map();
 
@@ -109,7 +110,7 @@ class _detalleTutoriaState extends State<detalleTutoria> {
     
     print("--->" + id_tutoria);
 
-    var url = Uri.parse("http://192.168.1.57:8000/getTutoria/");
+    var url = Uri.parse(URL+"/getTutoria/");
 
     /*await http.post(url,body: jsonEncode({"id_tutoria":this.id_tutoria})).then((res) {
       //var datarecived = jsonDecode(res.body);

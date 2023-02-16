@@ -14,6 +14,7 @@ class _editarEntradaState extends State<editarEntrada> {
   String id_usuario_profesor="";
   String id_tutoria="";
   String id_entrada="";
+  String URL="http://10.0.2.2:8000";
 
   //List entrada = [];
 
@@ -79,7 +80,7 @@ class _editarEntradaState extends State<editarEntrada> {
 
 
   actualizarEntrada(){
-    var url = Uri.parse("http://192.168.1.57:8000/updateEntrada/");
+    var url = Uri.parse(URL+"/updateEntrada/");
   //print("titulo="+tituloControlador.text+" desc="+descripcionControlador.text+" prof:"+id_usuario_profesor+" tutoria:"+id_tutoria);
   
     http.post(url, body: jsonEncode(
@@ -102,7 +103,7 @@ class _editarEntradaState extends State<editarEntrada> {
     
     print("--->" + id_tutoria);
 
-    var url = Uri.parse("http://192.168.1.57:8000/getEntrada/");
+    var url = Uri.parse(URL+"/getEntrada/");
 
     final res = await http.post(url, body: jsonEncode({"id_entrada": this.id_entrada}));
     var datarecived = jsonDecode(res.body);
