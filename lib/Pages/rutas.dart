@@ -25,7 +25,27 @@ class _RutasState extends State<Rutas> {
                   Navigator.pushNamed(context, "/home",
                       arguments: {'nombre': 'Bra Vegueta', 'age': 25});
                 }),
-
+            MaterialButton(
+                child: const Text("Login"),
+                color: Colors.greenAccent,
+                onPressed: () {
+                  Navigator.pushNamed(context, "/login",
+                      arguments: {'nombre': 'Bra Vegueta', 'age': 25});
+                }),
+            MaterialButton(
+                child: const Text("homeunologin"),
+                color: Colors.greenAccent,
+                onPressed: () {
+                  Navigator.pushNamed(context, "/homeunologin",
+                      arguments: {'nombre': 'Bra Vegueta', 'age': 25});
+                }),
+            MaterialButton(
+                child: const Text("homedoslogin"),
+                color: Colors.greenAccent,
+                onPressed: () {
+                  Navigator.pushNamed(context, "/homedoslogin",
+                      arguments: {'nombre': 'Bra Vegueta', 'age': 25});
+                }),
             MaterialButton(
                 child: const Text("listaTutorias"),
                 color: Colors.blueAccent,
