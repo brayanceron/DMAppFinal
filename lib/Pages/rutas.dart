@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:firebase_auth/firebase_auth.dart';
+
+import 'login/login.dart';
 
 class Rutas extends StatefulWidget {
   const Rutas({super.key});
@@ -15,10 +18,48 @@ class _RutasState extends State<Rutas> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text("Rutas")),
-        body: Column(
-          children: [
-            MaterialButton(
+        //appBar: AppBar(title: const Text("Rutas")),
+        body: StreamBuilder(
+                stream:FirebaseAuth.instance.authStateChanges(),
+                builder:(context,snapshot){
+                  if(snapshot.connectionState==ConnectionState.waiting){
+                    return Center(child:CircularProgressIndicator());
+                  }
+                  else if(snapshot.hasError){
+                    return Text("Hubo un error");
+                  }
+                  else if(snapshot.hasData){
+                    return columnarutas();
+                  }
+                  else{
+                    return login();
+                  }
+                }
+              ));
+         }
+
+  void peticionGet() {
+    var url = Uri.parse(URL+"/rutaUno/");
+
+    http.get(url).then((res) {
+      var datarecived = jsonDecode(res.body);
+      print("Peticion recivida: " + datarecived["atributo2"].toString());
+    });
+  }
+
+  void peticionPost() {
+    var url = Uri.parse(URL+"/rutaUno/");
+    var datasend =  jsonEncode({"datos_peticion": "Brayan OK", "atributo2": "valor2"});
+    http.post(url, body: datasend).then((res) {
+      print("Peticion recivida: " + res.body);
+    });
+  }
+
+  Widget columnarutas(){
+    return Column(
+      children: [
+        SizedBox(height: 50,),
+        MaterialButton(
                 child: const Text("Home"),
                 color: Colors.blueAccent,
                 onPressed: () {
@@ -120,25 +161,8 @@ class _RutasState extends State<Rutas> {
                 },
             ),
 
-
-          ],
-        ));
+      ],
+    );
   }
 
-  void peticionGet() {
-    var url = Uri.parse(URL+"/rutaUno/");
-
-    http.get(url).then((res) {
-      var datarecived = jsonDecode(res.body);
-      print("Peticion recivida: " + datarecived["atributo2"].toString());
-    });
-  }
-
-  void peticionPost() {
-    var url = Uri.parse(URL+"/rutaUno/");
-    var datasend =  jsonEncode({"datos_peticion": "Brayan OK", "atributo2": "valor2"});
-    http.post(url, body: datasend).then((res) {
-      print("Peticion recivida: " + res.body);
-    });
-  }
 }

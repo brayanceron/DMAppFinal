@@ -46,5 +46,6 @@ class _homeunoState extends State<homeuno> {
   }
    void signOut() async{
       await FirebaseAuth.instance.signOut();
+       Navigator.pushNamed(context, "/");
   }
 }

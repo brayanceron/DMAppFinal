@@ -19,9 +19,13 @@ class _loginState extends State<login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('login'),),
+      //appBar: AppBar(title: Text('login'),),
       body: Column(
         children: [
+          
+          SizedBox(height: 150,),
+          Text("Log In", style: TextStyle(fontSize: 40),),
+          SizedBox(height: 50,),
           Text("email"),
           TextField(controller: emailC,),
           Text("pass"),
@@ -42,6 +46,7 @@ class _loginState extends State<login> {
       print(emailC.text+" "+emailC.text.trim()+" - "+passC.text+" "+passC.text.trim());
       await FirebaseAuth.instance.signInWithEmailAndPassword(email: emailC.text.trim(), password: passC.text.trim());
       //await FirebaseAuth.instance.signInWithEmailAndPassword(email: "brayan0np@gmail.com", password: "madrid-44");
+      Navigator.pushNamed(context, "/",);
     }
     catch(e){
       print("Error: "+e.toString());
