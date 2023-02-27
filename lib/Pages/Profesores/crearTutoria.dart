@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -13,6 +12,7 @@ class crearTutoria extends StatefulWidget {
 class _crearTutoriaState extends State<crearTutoria> {
   Map argumentosRecividos = new Map();
   String id_usuario="";
+  String rol_usuario="";
   String URL="http://10.0.2.2:8000";
 
   TextEditingController nombre = new TextEditingController();
@@ -22,8 +22,12 @@ class _crearTutoriaState extends State<crearTutoria> {
   Widget build(BuildContext context) {
     argumentosRecividos = (ModalRoute.of(context)?.settings.arguments) as Map; 
     this.id_usuario = argumentosRecividos["id_usuario"].toString();
+    //this.rol_usuario='ESTUDIANTE';
+    this.rol_usuario='PROFESOR';
+    
     print("usuario: "+this.id_usuario);
-    return Scaffold(
+
+     return Scaffold(
       appBar: AppBar(title: Text("Crear Tutoria"),),
       body: ListView(
         children:   [
@@ -59,7 +63,9 @@ class _crearTutoriaState extends State<crearTutoria> {
         ],
       ),
     );
+    
   }
+
 
 registrarTutoria(){
 
@@ -69,9 +75,11 @@ registrarTutoria(){
   http.post(url, body: jsonEncode({"nombre":nombre.text,"id_profesor":id_usuario,"descripcion":descripcion.text}))
   .then((value){
     print(value);
+    Navigator.pushNamed(context, "/rutas",arguments: {'nombre': 'Bra Vegueta', 'age': 25});
   });
   
 }
 
 
 }
+

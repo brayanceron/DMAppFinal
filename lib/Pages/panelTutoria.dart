@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
+import 'package:flutter/services.dart';
 
 class panelTutoria extends StatefulWidget {
   const panelTutoria({super.key});
@@ -11,11 +13,15 @@ class panelTutoria extends StatefulWidget {
 
 class _panelTutoriaState extends State<panelTutoria> {
   String URL="http://10.0.2.2:8000";
+  final user = FirebaseAuth.instance.currentUser!; 
+  var usuarioInfo;
+  Map argumentosRecividos = new Map();
+
   String id_tutoria = "";
   String id_usuario = "";
   String rol_usuario = "";
 
-  Map argumentosRecividos = new Map();
+  
 
   List tutoria=[];
   
@@ -23,7 +29,7 @@ class _panelTutoriaState extends State<panelTutoria> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: 
-      AppBar(title: const Text("Panel principal tutoria"),),
+      AppBar(title:  const Text("Panel principal tutoria "),),
 
       body: FutureBuilder(
           future: cargar_informacion(),
@@ -38,6 +44,17 @@ class _panelTutoriaState extends State<panelTutoria> {
                   return ListView(
                           children: [
                             Text(tutoria[0]["nombre"].toString(),style:  const TextStyle(fontSize: 40,color: Colors.black,fontWeight: FontWeight.bold)),
+                            
+                            Row(
+                              children: [
+                                Text("Compartir:  "+this.id_tutoria),
+                                IconButton(
+                                  icon: Icon(Icons.copy),
+                                  onPressed: (() {
+                                    Clipboard.setData(ClipboardData(text: this.id_tutoria.toString()));
+                                })),
+                              ],
+                            ),
                             IconButton(alignment: Alignment.bottomLeft,
                               icon: const Icon(Icons.add_box,size: 30,color: Colors.blueAccent),
                               onPressed: () {
@@ -45,10 +62,12 @@ class _panelTutoriaState extends State<panelTutoria> {
                                 arguments: {'id_tutoria': id_tutoria,'id_usuario':id_usuario,'rol_usuario':rol_usuario});
                               },
                             ),
-                            IconButton(alignment: Alignment.bottomLeft,
+                            if(this.rol_usuario!="E")IconButton(alignment: Alignment.bottomLeft,
                                icon: Icon(Icons.fiber_new,size: 30,color: Colors.redAccent),
                               onPressed: () {
                                 print("ok");
+                                Navigator.pushNamed(context, "/crearEntrada",
+                                  arguments: {'id_usuario_profesor':'63e9b98e811ef54a3de59514','id_tutoria':id_tutoria});
                               },
                               ),
                             SizedBox(height: 20,),
@@ -65,7 +84,7 @@ class _panelTutoriaState extends State<panelTutoria> {
                                     //Desde aqui hay qllamar a verEntrada y mandarle los parmetros necesarios
                                     Navigator.pushNamed(context, "/getEntrada",
                                       arguments: {'id_tutoria':id_tutoria,'id_entrada':tutoria[0]["entradas"][index]["_id"]["\$oid"],
-                                      'id_usuario':id_usuario,'rol_usuario':rol_usuario} );
+                                      /*'id_usuario':id_usuario,'rol_usuario':rol_usuario*/} );
                                     
                                   },
                                   child: Card(
@@ -125,11 +144,16 @@ class _panelTutoriaState extends State<panelTutoria> {
 
   Future cargar_informacion() async {
     argumentosRecividos = (ModalRoute.of(context)?.settings.arguments) as Map;
+    await cargar_info_usuario();
+
     this.id_tutoria = argumentosRecividos["id_tutoria"].toString();
-    this.id_usuario = argumentosRecividos["id_usuario"].toString();
-    this.rol_usuario = argumentosRecividos["rol_usuario"].toString();
+    this.id_usuario = this.usuarioInfo[0]["_id"]["\$oid"] ;
+    this.rol_usuario = this.usuarioInfo[0]["rol"];
     
-    print("--->" + id_tutoria);
+    print("ooooo--->" + id_tutoria);
+
+
+
 
     var url = Uri.parse(URL+"/getContenidoTutoria/");
 
@@ -141,4 +165,11 @@ class _panelTutoriaState extends State<panelTutoria> {
     return datarecived;
   }
 
+  Future cargar_info_usuario() async{
+    var url = Uri.parse(URL+"/getInfoUsuario/");
+    final res = await http.post(url, body: jsonEncode({"correo": this.user.email}));
+    this.usuarioInfo = jsonDecode(res.body);
+    print("ROL:"+this.usuarioInfo[0]["rol"]);
+
+  }
 }

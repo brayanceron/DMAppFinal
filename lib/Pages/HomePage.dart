@@ -12,9 +12,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  Map argumentosRecividos = new Map();
 
-  Map argumentosRecividos= new Map();
-
+  List<Widget> opciones = const [
+    Icon(Icons.home),
+    Icon(Icons.person),
+    Icon(Icons.menu),
+  ];
+  int opcionActual = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -22,70 +27,103 @@ class _HomePageState extends State<HomePage> {
     print(argumentosRecividos);
 
     return Scaffold(
-      appBar: AppBar(title: Text("Page Home"),),
-      body: ListView(
-        children: [
-          Text("ok"),
-          MaterialButton(
-            child: Text("Seleccion Archivo"),
-            color: Colors.blueAccent,
-            onPressed: selecionar_archivo
-            ),
-          //Image.network('http://192.168.1.57:8000/media/Screenshot_20230218-013239_D8S4Wda.png'),
-        ],
-      ),
-      
-    );
+        appBar: AppBar(
+          title: Text("Page Home"),
+        ),
+        body: RefreshIndicator(
+          onRefresh: () async {},
+          child: ListView(
+            children: [
+              Text("ok"),
+              MaterialButton(
+                  child: Text("Seleccion Archivo"),
+                  color: Colors.blueAccent,
+                  onPressed: selecionar_archivo),
+              //Image.network('http://192.168.1.57:8000/media/Screenshot_20230218-013239_D8S4Wda.png'),
+            ],
+          ),
+        ),
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: barraNavegacion(),
+        ));
   }
 
-   selecionar_archivo() async {
-        FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
-        var URL = Uri.parse('http://192.168.1.57:8000/subirArchivotest/');
+  selecionar_archivo() async {
+    FilePickerResult? result =
+        await FilePicker.platform.pickFiles(allowMultiple: true);
+    var URL = Uri.parse('http://192.168.1.57:8000/subirArchivotest/');
 
-        if(result != null) {
-          //PlatformFile file = result.files.first;
-          List<File> files = result.paths.map((path) => File(path.toString())).toList();
-          
-          print("--------------");
-          for (File file in files){
-              /*print(file.name);
+    if (result != null) {
+      //PlatformFile file = result.files.first;
+      List<File> files =
+          result.paths.map((path) => File(path.toString())).toList();
+
+      print("--------------");
+      for (File file in files) {
+        /*print(file.name);
               print(file.bytes);
               print(file.size);
               print(file.extension);*/
-              print(file.path); 
+        print(file.path);
 
-    
-              
-              var request = http.MultipartRequest('POST', URL);
-              request.files.add(await http.MultipartFile.fromPath("Myarchivo", file.path.toString()));
-              var res = await request.send()
-              .then((response){                
-
-                print(response.toString());
-                if (response.statusCode == 200) print('Uploaded!');
-                /*
+        var request = http.MultipartRequest('POST', URL);
+        request.files.add(await http.MultipartFile.fromPath(
+            "Myarchivo", file.path.toString()));
+        var res = await request.send().then((response) {
+          print(response.toString());
+          if (response.statusCode == 200) print('Uploaded!');
+          /*
                 http.Response.fromStream(response).then((onValue){
                   print(response.statusCode);                             
                 });
                 */
-                
-              });
-          }
-          print("--------------");
-                  
-          //print(res.body);
+        });
+      }
+      print("--------------");
 
-          //print(res.reasonPharse);          
-          //return res.reasonPhrase;
-          return "0";
+      //print(res.body);
 
-        } else {
-          // Usuario cancela carga
-        }
+      //print(res.reasonPharse);
+      //return res.reasonPhrase;
+      return "0";
+    } else {
+      // Usuario cancela carga
+    }
   }
 
-
-
-
-
+  Widget barraNavegacion() {
+    return Container(
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.only(
+              topRight: Radius.circular(30),
+              topLeft: Radius.circular(30),
+              bottomLeft: Radius.circular(30),
+              bottomRight: Radius.circular(30)),
+          boxShadow: [
+            BoxShadow(color: Colors.black38, spreadRadius: 0, blurRadius: 10),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(30.0),
+            topRight: Radius.circular(30.0),
+            bottomLeft: Radius.circular(30.0),
+            bottomRight: Radius.circular(30.0),
+          ),
+          child: BottomNavigationBar(
+              currentIndex: opcionActual,
+              onTap: (nuevaOpcion) {
+                setState(() {
+                  opcionActual = nuevaOpcion;
+                });
+              },
+              items: const [
+                BottomNavigationBarItem(label: "Home", icon: Icon(Icons.home)),
+                BottomNavigationBarItem(
+                    label: "Profile", icon: Icon(Icons.person)),
+                BottomNavigationBarItem(label: "Menu", icon: Icon(Icons.menu)),
+              ]),
+        ));
+  }
 }

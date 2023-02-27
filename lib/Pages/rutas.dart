@@ -1,10 +1,11 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'login/login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+
 
 class Rutas extends StatefulWidget {
   const Rutas({super.key});
@@ -13,10 +14,25 @@ class Rutas extends StatefulWidget {
   State<Rutas> createState() => _RutasState();
 }
 
+
 class _RutasState extends State<Rutas> {
-  String URL="http://192.168.1.57:8000";
+  User? user = FirebaseAuth.instance.currentUser; 
+  var usuarioInfo; 
+  //this.usuarioInfo[0]["rol"] para saber el rol
+  //this.usuarioInfo[0]["nombre"] para saber el nombre
+  //this.usuarioInfo[0]["_id"]["\$oid"] para saber el id
+
+  String URL="http://10.0.2.2:8000";
+  //String id_tutoria = "";
+  String id_usuario = "";
+  String rol_usuario = "";
+
+
+  
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
         //appBar: AppBar(title: const Text("Rutas")),
         body: StreamBuilder(
@@ -29,13 +45,21 @@ class _RutasState extends State<Rutas> {
                     return Text("Hubo un error");
                   }
                   else if(snapshot.hasData){
-                    return columnarutas();
+                    print("La app ya encontro una sesion");
+                    return FutureBuilder(
+                      future: cargar_info_usuario(),
+                      builder: (context, snapshot) {
+                        return columnarutas();
+                      },
+                      );
                   }
                   else{
+                    print("No has iniciado sesion todabia");
                     return login();
                   }
                 }
               ));
+        
          }
 
   void peticionGet() {
@@ -53,6 +77,21 @@ class _RutasState extends State<Rutas> {
     http.post(url, body: datasend).then((res) {
       print("Peticion recivida: " + res.body);
     });
+  }
+
+  Future cargar_info_usuario() async{
+    
+    var url = Uri.parse(URL+"/getInfoUsuario/");
+    final res = await http.post(url, body: jsonEncode({"correo": this.user?.email}));
+    this.usuarioInfo = jsonDecode(res.body);
+
+    print(this.usuarioInfo);
+    //print("ROL:"+this.usuarioInfo[0]["rol"]);
+    //print("_id: "+this.usuarioInfo[0]["_id"]["\$oid"]);
+    this.id_usuario = this.usuarioInfo[0]["_id"]["\$oid"] ;
+    this.rol_usuario = this.usuarioInfo[0]["rol"];
+    
+
   }
 
   Widget columnarutas(){
@@ -88,13 +127,19 @@ class _RutasState extends State<Rutas> {
                       arguments: {'nombre': 'Bra Vegueta', 'age': 25});
                 }),
             MaterialButton(
+                child: const Text("catalogoTutorias"),
+                color: Colors.blueAccent,
+                onPressed: () {
+                  Navigator.pushNamed(context, "/catalogoTutorias",
+                      /*arguments: {'id_usuario':'63e9b904811ef54a3de59509'}*/);
+                }),
+            MaterialButton(
                 child: const Text("listaTutorias"),
                 color: Colors.blueAccent,
                 onPressed: () {
                   Navigator.pushNamed(context, "/listaTutorias",
-                      arguments: {'id_usuario':'63e9b904811ef54a3de59509','rol_usuario':"ESTUDIANTE"});
+                      /*arguments: {'id_usuario':'63e9b904811ef54a3de59509'}*/);
                 }),
-
             MaterialButton(
                 child: const Text("detalleTutoria"),
                 color: Colors.blueAccent,
@@ -108,15 +153,15 @@ class _RutasState extends State<Rutas> {
                 color: Colors.blueAccent,
                 onPressed: () {
                   Navigator.pushNamed(context, "/panelTutoria",
-                      arguments: {'id_tutoria': '63e9bc8d811ef54a3de5952c','id_usuario':'63ea888d072e21c4c25f7e88','rol_usuario':"ESTUDIANTE"});
+                      arguments: {'id_tutoria': '63e9bc8d811ef54a3de5952c'});
                 }),
 
-            MaterialButton(
+            /*MaterialButton(
               child: const Text("Peticion GET"),
               color: Colors.blueAccent,
               onPressed: peticionGet,
             ),
-
+            */
             MaterialButton(
               child: const Text("Peticion POST"),
               color: Colors.blueAccent,
@@ -127,8 +172,10 @@ class _RutasState extends State<Rutas> {
               child: const Text("Crear Tutoria"),
               color: Colors.pink,
               onPressed: () {
+                  //this.rol_usuario = 'E';
+                  if(this.usuarioInfo[0]["rol"]!='P'){ return null;}
                   Navigator.pushNamed(context, "/crearTutoria",
-                      arguments: {'id_usuario':'63e9b9e1811ef54a3de5951e'});
+                      arguments: {'id_usuario':this.id_usuario});
                 },
             ),
 
@@ -138,7 +185,7 @@ class _RutasState extends State<Rutas> {
               onPressed: () {
                   Navigator.pushNamed(context, "/getEntrada",
                       arguments: {'id_tutoria':'63e9bc8d811ef54a3de5952c','id_entrada':'63ea94f6072e21c4c25f7eb1',
-                      'id_usuario':'63ea888d072e21c4c25f7e88','rol_usuario':'ESTUDIANTE'} );
+                      /*'id_usuario':'63ea888d072e21c4c25f7e88','rol_usuario':'ESTUDIANTE'*/} );
                 },
             ),
 
@@ -148,7 +195,7 @@ class _RutasState extends State<Rutas> {
               color: Colors.pink,
               onPressed: () {
                   Navigator.pushNamed(context, "/crearEntrada",
-                      arguments: {'id_usuario_profesor':'63e9b98e811ef54a3de59514','id_tutoria':'63e9bc8d811ef54a3de5952c'});
+                      arguments: {'id_tutoria':'63e9bc8d811ef54a3de5952c'});
                 },
             ),
 
@@ -158,6 +205,32 @@ class _RutasState extends State<Rutas> {
               onPressed: () {
                   Navigator.pushNamed(context, "/editarEntrada",
                       arguments: {'id_entrada':'63ed43889d15bdc38e6edb8a','id_tutoria':'63e9bc8d811ef54a3de5952c','id_usuario_profesor':'63e9b98e811ef54a3de59514'});
+                },
+            ),
+
+            MaterialButton(
+              child: const Text("Solicitudes Profesor"),
+              color: Colors.pink,
+              onPressed: () {
+                  if(this.usuarioInfo[0]["rol"]!='P'){ return null;}
+                  Navigator.pushNamed(context, "/solicitudesProfesor",arguments: {
+                    'id_tutoria_publicada':'63f8dd02b159d685dd68ec92',
+                    'id_solicitante':'63e9b904811ef54a3de59509',//(leonor castillo) //deberia ir this.id_usuario
+                    'id_profesor':'OPT'                    
+                    });
+                },
+            ),
+
+            MaterialButton(
+              child: const Text("Solicitudes Estudiante"),
+              color: Colors.blueAccent,
+              onPressed: () {
+                  if(this.usuarioInfo[0]["rol"]=='P'){ return null;}//esta condicion si funciona, esta desabilitada solamente para hacer pruebas, activarlo luego
+                  Navigator.pushNamed(context, "/solicitudesEstudiante",arguments: {
+                    'id_tutoria_publicada':'63f8dd02b159d685dd68ec92',
+                    'id_solicitante':'63e9b904811ef54a3de59509',//(leonor castillo) //deberia ir this.id_usuario
+                    'id_profesor':'OPT'                    
+                    });
                 },
             ),
 

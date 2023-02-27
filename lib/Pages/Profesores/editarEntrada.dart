@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class editarEntrada extends StatefulWidget {
   const editarEntrada({super.key});
@@ -10,11 +11,17 @@ class editarEntrada extends StatefulWidget {
 }
 
 class _editarEntradaState extends State<editarEntrada> {
+  String URL="http://10.0.2.2:8000";
+  final user = FirebaseAuth.instance.currentUser!; 
+  var usuarioInfo;
+
   Map argumentosRecividos = new Map();
+
   String id_usuario_profesor="";
+  String rol_usuario="";
   String id_tutoria="";
   String id_entrada="";
-  String URL="http://10.0.2.2:8000";
+  
 
   //List entrada = [];
 
@@ -79,7 +86,7 @@ class _editarEntradaState extends State<editarEntrada> {
   }
 
 
-  actualizarEntrada(){
+    actualizarEntrada(){
     var url = Uri.parse(URL+"/updateEntrada/");
   //print("titulo="+tituloControlador.text+" desc="+descripcionControlador.text+" prof:"+id_usuario_profesor+" tutoria:"+id_tutoria);
   
@@ -91,17 +98,26 @@ class _editarEntradaState extends State<editarEntrada> {
     ))
     .then((value){
       print(value);
+      Navigator.pushNamed(context, "/getEntrada",
+                      arguments: {'id_tutoria':this.id_tutoria,'id_entrada':this.id_entrada,
+                      /*'id_usuario':'63ea888d072e21c4c25f7e88','rol_usuario':'ESTUDIANTE'*/} );
     });
   }
 
-   Future cargar_informacion() async {
+    Future cargar_informacion() async {
     argumentosRecividos = (ModalRoute.of(context)?.settings.arguments) as Map;
+    await cargar_info_usuario();
+
+
     this.id_tutoria = argumentosRecividos["id_tutoria"].toString();
     this.id_entrada = argumentosRecividos["id_entrada"].toString();
-    this.id_usuario_profesor = argumentosRecividos["id_usuario_profesor"].toString();
+    this.id_usuario_profesor = this.usuarioInfo[0]["_id"]["\$oid"] ;
+    this.rol_usuario = this.usuarioInfo[0]["rol"];
+
+    //this.id_usuario_profesor = argumentosRecividos["id_usuario_profesor"].toString();
     //this.rol_usuario = argumentosRecividos["rol_usuario"].toString();
     
-    print("--->" + id_tutoria);
+    //print("--->" + id_tutoria);
 
     var url = Uri.parse(URL+"/getEntrada/");
 
@@ -116,6 +132,14 @@ class _editarEntradaState extends State<editarEntrada> {
     return datarecived;
   }
 
+
+    Future cargar_info_usuario() async{
+    var url = Uri.parse(URL+"/getInfoUsuario/");
+    final res = await http.post(url, body: jsonEncode({"correo": this.user.email}));
+    this.usuarioInfo = jsonDecode(res.body);
+    print("ROL:"+this.usuarioInfo[0]["rol"]);
+
+  }
 
 
 
