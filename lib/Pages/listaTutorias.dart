@@ -1,8 +1,11 @@
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
+
+import '../utilidades/utilidades.dart';
 
 class listaTutorias extends StatefulWidget {
   const listaTutorias({super.key});
@@ -14,10 +17,14 @@ class listaTutorias extends StatefulWidget {
 class _listaTutoriasState extends State<listaTutorias> {  
   
   Map argumentosRecividos = new Map();
-  String URL="http://10.0.2.2:8000";
+  //String URL="http://10.0.2.2:8000";
+  String URL=SERVER_URL;
 
   final user = FirebaseAuth.instance.currentUser!; 
   var usuarioInfo;
+
+  String id_usuario = "";
+  String rol_usuario = "";
 
   List tutoriasEnProgresoEstudiante=[];
   List tutoriasEnProgresoProfesor=[];
@@ -176,6 +183,18 @@ class _listaTutoriasState extends State<listaTutorias> {
                         ),
                       //-----------------------------------------------------------------------------------------------------
                       Text("Tutorias en Solicitud:"),
+                      //-----------------------------------------------------------------------------------------------------
+                      if(this.rol_usuario!="E")
+                      MaterialButton(
+                        child: const Text("Crear Tutoria"),
+                        color: Colors.pink,
+                        onPressed: () {
+                            if(this.usuarioInfo[0]["rol"]!='P'){ return null;}
+                            Navigator.pushNamed(context, "/crearTutoria",
+                                arguments: {'id_usuario':this.id_usuario,'rol_usuario':this.rol_usuario});
+                          },
+                      )
+
                   ],
               );
               
@@ -183,8 +202,9 @@ class _listaTutoriasState extends State<listaTutorias> {
 
         },
       
-      )
-    
+      ),
+      bottomNavigationBar:  myBottomNavigationBar(email: this.user.email.toString(),opcionActual: 1,),
+      //floatingActionButton: FloatingActionButton(onPressed: (){print("ok");}),
     );
   }
 
@@ -230,8 +250,13 @@ class _listaTutoriasState extends State<listaTutorias> {
     var url = Uri.parse(URL+"/getInfoUsuario/");
     final res = await http.post(url, body: jsonEncode({"correo": this.user.email}));
     this.usuarioInfo = jsonDecode(res.body);
+
     print("ROL:"+this.usuarioInfo[0]["rol"]);
+
+    this.id_usuario = this.usuarioInfo[0]["_id"]["\$oid"] ;
+    this.rol_usuario = this.usuarioInfo[0]["rol"];
 
   }
 
+ 
 }

@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../utilidades/utilidades.dart';
 
 
 class crearEntrada extends StatefulWidget {
@@ -13,7 +14,8 @@ class crearEntrada extends StatefulWidget {
 }
 
 class _crearEntradaState extends State<crearEntrada> {
-  String URL="http://10.0.2.2:8000";
+  //String URL="http://10.0.2.2:8000";
+  String URL=SERVER_URL;
   
   Map argumentosRecividos = new Map();
   final user = FirebaseAuth.instance.currentUser!; 
@@ -104,7 +106,7 @@ Future cargar_info_usuario() async{
   }
 
 registrarEntrada(){
-  if(this.rol_usuario!='E'){
+  /*if(this.rol_usuario!='E'){*/
       var url = Uri.parse(URL+"/registrarEntrada/");
       //print("titulo="+tituloControlador.text+" desc="+descripcionControlador.text+" prof:"+id_usuario_profesor+" tutoria:"+id_tutoria);
   
@@ -114,10 +116,10 @@ registrarEntrada(){
         print(value);
         Navigator.pushNamed(context, "/panelTutoria",arguments: {'id_tutoria':this.id_tutoria});
       });
-  }
+  /*}
   else{
     print("Este Rol no puede agregar una entrada");
-  }
+  }*/
   
   
 }

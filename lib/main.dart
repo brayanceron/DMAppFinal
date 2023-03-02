@@ -1,6 +1,7 @@
 import 'package:appfinal/Pages/Profesores/crearEntrada.dart';
 import 'package:appfinal/Pages/Profesores/crearTutoria.dart';
 import 'package:appfinal/Pages/Profesores/solicitudesProfesor.dart';
+import 'package:appfinal/Pages/chat.dart';
 import 'Pages/Profesores/editarEntrada.dart';
 import 'package:appfinal/Pages/catalogoTutorias.dart';
 import 'package:appfinal/Pages/detalleTutoria.dart';
@@ -58,6 +59,9 @@ class MyApp extends StatelessWidget {
 
         '/solicitudesProfesor':(context) => solicitudesProfesor(),
         '/solicitudesEstudiante':(context) => solicitudesEstudiante(),
+        '/chat':(context) => chat(),
+
+
 
         '/login':(context) => login(),
         '/homeunologin':(context) => homeuno(),

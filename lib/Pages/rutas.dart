@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'login/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../utilidades/utilidades.dart';
 
 
 class Rutas extends StatefulWidget {
@@ -22,7 +23,7 @@ class _RutasState extends State<Rutas> {
   //this.usuarioInfo[0]["nombre"] para saber el nombre
   //this.usuarioInfo[0]["_id"]["\$oid"] para saber el id
 
-  String URL="http://10.0.2.2:8000";
+  String URL=SERVER_URL;
   //String id_tutoria = "";
   String id_usuario = "";
   String rol_usuario = "";
@@ -103,7 +104,7 @@ class _RutasState extends State<Rutas> {
                 color: Colors.blueAccent,
                 onPressed: () {
                   Navigator.pushNamed(context, "/home",
-                      arguments: {'nombre': 'Bra Vegueta', 'age': 25});
+                      arguments: {'opt_actual': 0});
                 }),
             MaterialButton(
                 child: const Text("Login"),
@@ -119,13 +120,13 @@ class _RutasState extends State<Rutas> {
                   Navigator.pushNamed(context, "/homeunologin",
                       arguments: {'nombre': 'Bra Vegueta', 'age': 25});
                 }),
-            MaterialButton(
+            /*MaterialButton(
                 child: const Text("homedoslogin"),
                 color: Colors.greenAccent,
                 onPressed: () {
                   Navigator.pushNamed(context, "/homedoslogin",
                       arguments: {'nombre': 'Bra Vegueta', 'age': 25});
-                }),
+                }),*/
             MaterialButton(
                 child: const Text("catalogoTutorias"),
                 color: Colors.blueAccent,
@@ -231,6 +232,13 @@ class _RutasState extends State<Rutas> {
                     'id_solicitante':'63e9b904811ef54a3de59509',//(leonor castillo) //deberia ir this.id_usuario
                     'id_profesor':'OPT'                    
                     });
+                },
+            ),
+            MaterialButton(
+              child: const Text("Chat"),
+              color: Colors.blueAccent,
+              onPressed: () {
+                  Navigator.pushNamed(context, "/chat");
                 },
             ),
 

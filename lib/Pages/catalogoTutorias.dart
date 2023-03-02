@@ -8,6 +8,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../utilidades/utilidades.dart';
+
 
 class catalogoTutorias extends StatefulWidget {
   const catalogoTutorias({super.key});
@@ -17,7 +19,8 @@ class catalogoTutorias extends StatefulWidget {
 }
 
 class _catalogoTutoriasState extends State<catalogoTutorias> {
-  String URL="http://10.0.2.2:8000";
+  //String URL="http://10.0.2.2:8000";
+  String URL=SERVER_URL;
   
   Map argumentosRecividos = new Map();
   final user = FirebaseAuth.instance.currentUser!; 
@@ -119,6 +122,7 @@ class _catalogoTutoriasState extends State<catalogoTutorias> {
             }
         },
         ),
+      bottomNavigationBar: myBottomNavigationBar(email: this.user.email.toString(),opcionActual: 0,)
     );
   }
 

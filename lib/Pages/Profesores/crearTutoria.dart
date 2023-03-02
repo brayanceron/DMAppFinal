@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../../utilidades/utilidades.dart';
+
 class crearTutoria extends StatefulWidget {
   const crearTutoria({super.key});
 
@@ -13,7 +15,8 @@ class _crearTutoriaState extends State<crearTutoria> {
   Map argumentosRecividos = new Map();
   String id_usuario="";
   String rol_usuario="";
-  String URL="http://10.0.2.2:8000";
+  //String URL="http://10.0.2.2:8000";
+  String URL=SERVER_URL;
 
   TextEditingController nombre = new TextEditingController();
   TextEditingController descripcion = new TextEditingController();
@@ -23,13 +26,13 @@ class _crearTutoriaState extends State<crearTutoria> {
     argumentosRecividos = (ModalRoute.of(context)?.settings.arguments) as Map; 
     this.id_usuario = argumentosRecividos["id_usuario"].toString();
     //this.rol_usuario='ESTUDIANTE';
-    this.rol_usuario='PROFESOR';
+    this.rol_usuario=argumentosRecividos["rol_usuario"].toString();;
     
     print("usuario: "+this.id_usuario);
 
      return Scaffold(
       appBar: AppBar(title: Text("Crear Tutoria"),),
-      body: ListView(
+      body:  ListView(
         children:   [
           Text("Nueva tutoria",style: TextStyle(fontSize: 40, color: Colors.black,fontWeight: FontWeight.bold)),
           SizedBox(height: 30,),
@@ -52,7 +55,8 @@ class _crearTutoriaState extends State<crearTutoria> {
               ),
           ),
           
-          Padding(
+           if(this.rol_usuario!="E") 
+           Padding(
             padding: EdgeInsets.all(15),
             child: MaterialButton(
               child: Text("Publicar Tutoria"),
@@ -69,13 +73,14 @@ class _crearTutoriaState extends State<crearTutoria> {
 
 registrarTutoria(){
 
-  var url = Uri.parse(URL+"/registrarTutoria/");
+  var url = Uri.parse(URL+"/publicarTutoria/");
   print("n="+nombre.text+" d="+descripcion.text);
   
   http.post(url, body: jsonEncode({"nombre":nombre.text,"id_profesor":id_usuario,"descripcion":descripcion.text}))
   .then((value){
     print(value);
-    Navigator.pushNamed(context, "/rutas",arguments: {'nombre': 'Bra Vegueta', 'age': 25});
+    //Navigator.pushNamed(context, "/rutas",arguments: {'nombre': 'Bra Vegueta', 'age': 25});
+    Navigator.pushNamed(context, "/listaTutorias");
   });
   
 }

@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../utilidades/utilidades.dart';
+
 class editarEntrada extends StatefulWidget {
   const editarEntrada({super.key});
 
@@ -11,7 +13,8 @@ class editarEntrada extends StatefulWidget {
 }
 
 class _editarEntradaState extends State<editarEntrada> {
-  String URL="http://10.0.2.2:8000";
+  //String URL="http://10.0.2.2:8000";
+  String URL=SERVER_URL;
   final user = FirebaseAuth.instance.currentUser!; 
   var usuarioInfo;
 

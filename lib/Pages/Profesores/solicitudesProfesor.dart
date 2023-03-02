@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 
+import '../../utilidades/utilidades.dart';
+
 class solicitudesProfesor extends StatefulWidget {
   const solicitudesProfesor({super.key});
 
@@ -14,7 +16,8 @@ class solicitudesProfesor extends StatefulWidget {
 
 class _solicitudesProfesorState extends State<solicitudesProfesor> {
   Map argumentosRecividos = new Map();
-  String URL="http://10.0.2.2:8000";
+  //String URL="http://10.0.2.2:8000";
+  String URL=SERVER_URL;
 
   final user = FirebaseAuth.instance.currentUser!; 
   var usuarioInfo;
@@ -105,6 +108,7 @@ class _solicitudesProfesorState extends State<solicitudesProfesor> {
             }
         },
       ),
+      bottomNavigationBar:  myBottomNavigationBar(email: this.user.email.toString(),opcionActual: 2,)
     );
   }
 

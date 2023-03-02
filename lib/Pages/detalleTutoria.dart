@@ -5,6 +5,8 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:http/http.dart' as http;
 
+import '../utilidades/utilidades.dart';
+
 class detalleTutoria extends StatefulWidget {
   const detalleTutoria({super.key});
 
@@ -17,7 +19,8 @@ class _detalleTutoriaState extends State<detalleTutoria> {
   String id_usuario = "";
   String rol_usuario = "";
   List tutoria = [];
-  String URL="http://10.0.2.2:8000";
+  //String URL="http://10.0.2.2:8000";
+  String URL=SERVER_URL;
 
   Map argumentosRecividos = new Map();
 
