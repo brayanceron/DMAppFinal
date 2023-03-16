@@ -90,7 +90,7 @@ class _getEntradaState extends State<getEntrada> {
 
     var url = Uri.parse(URL+"/getEntrada/");
 
-    final res = await http.post(url, body: jsonEncode({"id_entrada": this.id_entrada}));
+    final res = await http.post(url, body: jsonEncode({"id_entrada": this.id_entrada,"current_user_id": this.id_usuario}));
     var datarecived = jsonDecode(res.body);
 
     print("nueva forma" + datarecived.toString());

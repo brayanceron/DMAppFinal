@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 //String SERVER_URL="http://10.0.2.2:8000";
-String SERVER_URL="http://192.168.1.57:8000/api";
+//String SERVER_URL="http://192.168.1.57:8000/api";
+//String SERVER_URL="http://172.16.8.4:8000/api";
+String SERVER_URL="http://129.213.171.120:8000/api";
+
 
 class myBottomNavigationBar extends StatefulWidget {
   myBottomNavigationBar({super.key,required String this.email,required int this.opcionActual});

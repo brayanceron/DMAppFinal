@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 
 import '../utilidades/utilidades.dart';
 
+String URL=SERVER_URL;
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -19,6 +20,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String URL=SERVER_URL;
   Map argumentosRecividos = new Map();
+  FilePickerResult? archivosSeleccionados;
 
   List body = const [
       catalogoTutorias(),
@@ -41,15 +43,11 @@ class _HomePageState extends State<HomePage> {
         );
   }
 
-  selecionar_archivo() async {
-    FilePickerResult? result =
-        await FilePicker.platform.pickFiles(allowMultiple: true);
-    var URL = Uri.parse('http://192.168.1.57:8000/api/subirArchivotest/');
-
-    if (result != null) {
+  subir_archivos()async{
+    var URL = Uri.parse(SERVER_URL+'/subirArchivotest/');
+    if (this.archivosSeleccionados != null)  {
       //PlatformFile file = result.files.first;
-      List<File> files =
-          result.paths.map((path) => File(path.toString())).toList();
+      List<File> files = this.archivosSeleccionados!.paths.map((path) => File(path.toString())).toList();
 
       print("--------------");
       for (File file in files) {
@@ -80,8 +78,14 @@ class _HomePageState extends State<HomePage> {
       //return res.reasonPhrase;
       return "0";
     } else {
-      // Usuario cancela carga
+      print("NO HAY NINGUN ARCHIVO SELECCIONADO"); 
     }
+  }
+  selecionar_archivos() async {
+    this.archivosSeleccionados = await FilePicker.platform.pickFiles(allowMultiple: true);
+    
+
+    
   }
 
   Widget barraNavegacion() {
@@ -132,10 +136,23 @@ class _HomePageState extends State<HomePage> {
           child: ListView(
             children: [
               Text("ok"),
+              Text("Imagen"),
+              SizedBox(
+                width: 100,
+                height: 100,
+                child: Image.network(
+                URL+'/media/f6a8942f-4e20-4dd6-b675-15f93872aba4software-de-codificación-mujer-programadora-desarrolladora-programador-desarrollador-en-computadora-231060005.jpg'
+                ),
+              ),
+              
               MaterialButton(
                   child: Text("Seleccion Archivo"),
                   color: Colors.blueAccent,
-                  onPressed: selecionar_archivo),
+                  onPressed: selecionar_archivos),
+              MaterialButton(
+                  child: Text("Subir Archivo"),
+                  color: Colors.blueAccent,
+                  onPressed: subir_archivos),
               //Image.network('http://192.168.1.57:8000/media/Screenshot_20230218-013239_D8S4Wda.png'),
             ],
           ),

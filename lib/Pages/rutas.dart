@@ -81,11 +81,12 @@ class _RutasState extends State<Rutas> {
   }
 
   Future cargar_info_usuario() async{
-    
+    user = await FirebaseAuth.instance.currentUser; 
     var url = Uri.parse(URL+"/getInfoUsuario/");
     final res = await http.post(url, body: jsonEncode({"correo": this.user?.email}));
     this.usuarioInfo = jsonDecode(res.body);
 
+    print("****MOVILE*****");
     print(this.usuarioInfo);
     //print("ROL:"+this.usuarioInfo[0]["rol"]);
     //print("_id: "+this.usuarioInfo[0]["_id"]["\$oid"]);

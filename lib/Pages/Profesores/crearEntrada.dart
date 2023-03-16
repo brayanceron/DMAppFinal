@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:io';
 
 import '../../utilidades/utilidades.dart';
 
@@ -18,6 +20,7 @@ class _crearEntradaState extends State<crearEntrada> {
   String URL=SERVER_URL;
   
   Map argumentosRecividos = new Map();
+  FilePickerResult? archivosSeleccionados;
   final user = FirebaseAuth.instance.currentUser!; 
   var usuarioInfo;
 
@@ -73,7 +76,12 @@ class _crearEntradaState extends State<crearEntrada> {
                           color: Colors.blueAccent,
                           onPressed: registrarEntrada,
                         )          
-                      )
+                      ),
+                      MaterialButton(
+                        child: Text("Seleccionar Archivos"),
+                        color: Colors.blueAccent,
+                        onPressed: selecionar_archivos
+                        )
 
                     ],
                   );
@@ -105,7 +113,72 @@ Future cargar_info_usuario() async{
 
   }
 
-registrarEntrada(){
+registrarEntrada() async {
+  /*if(this.rol_usuario!='E'){*/
+      var url = Uri.parse(URL+"/registrarEntrada/");
+      //print("titulo="+tituloControlador.text+" desc="+descripcionControlador.text+" prof:"+id_usuario_profesor+" tutoria:"+id_tutoria);
+  
+
+      /*
+      http.post(url, body: jsonEncode({"titulo":tituloControlador.text,'id_tutoria':id_tutoria,
+      "id_profesor":id_usuario_profesor,"descripcion":descripcionControlador.text}))
+      .then((value){
+        print(value);
+        Navigator.pushNamed(context, "/panelTutoria",arguments: {'id_tutoria':this.id_tutoria});
+      });*/
+
+
+
+  /*}
+  else{
+    print("Este Rol no puede agregar una entrada");
+  }*/
+       if (this.archivosSeleccionados != null)  {  //validar que las cajas de texto tampoco sean nulas esto para crear tutoria y pra crear entrada
+      List<File> files = this.archivosSeleccionados!.paths.map((path) => File(path.toString())).toList();
+
+      print("--------------");
+      var request = http.MultipartRequest('POST', url);
+        
+      request.fields["titulo"]=tituloControlador.text;
+      request.fields["id_tutoria"]=id_tutoria;
+      request.fields["id_profesor"]=id_usuario_profesor;
+      request.fields["descripcion"]=descripcionControlador.text;
+      request.fields["current_user_id"]=this.id_usuario_profesor;
+      
+      int a=0;
+      for (File file in files) {
+        /*print(file.name);
+              print(file.bytes);
+              print(file.size);
+              print(file.extension);*/
+        print(file.path);
+        request.files.add(await http.MultipartFile.fromPath("Myarchivo"+a.toString(), file.path.toString()));
+        a++;        
+      }
+
+      var res = await request.send()
+        .then((response) {
+          print(response.toString());
+          if (response.statusCode == 200) {print('Uploaded!');Navigator.pushNamed(context, "/panelTutoria",arguments: {'id_tutoria':this.id_tutoria});};
+          
+        });
+
+      print("--------------");
+
+      //print(res.body);
+
+      //print(res.reasonPharse);
+      //return res.reasonPhrase;
+      return "0";
+    } else {
+      print("NO HAY NINGUN ARCHIVO SELECCIONADO"); 
+    }
+
+  
+  
+}
+
+registrarEntrada2(){
   /*if(this.rol_usuario!='E'){*/
       var url = Uri.parse(URL+"/registrarEntrada/");
       //print("titulo="+tituloControlador.text+" desc="+descripcionControlador.text+" prof:"+id_usuario_profesor+" tutoria:"+id_tutoria);
@@ -124,7 +197,10 @@ registrarEntrada(){
   
 }
 
-
+selecionar_archivos() async {
+    //this.archivosSeleccionados = await FilePicker.platform.pickFiles(allowMultiple: true);
+    this.archivosSeleccionados = await FilePicker.platform.pickFiles(allowMultiple: true);
+  }
 
 
 }

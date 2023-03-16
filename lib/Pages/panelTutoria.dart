@@ -173,7 +173,7 @@ class _panelTutoriaState extends State<panelTutoria> {
     //Obteniendo las entradas de la tutoria
     var url = Uri.parse(URL+"/getContenidoTutoria/");
 
-    final res = await http.post(url, body: jsonEncode({"id_tutoria": this.id_tutoria}));
+    final res = await http.post(url, body: jsonEncode({"id_tutoria": this.id_tutoria,"current_user_id":this.id_usuario}));
     var datarecived = jsonDecode(res.body);
 
     print("Entradas tutoria" + datarecived.toString());

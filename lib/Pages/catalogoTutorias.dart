@@ -87,8 +87,15 @@ class _catalogoTutoriasState extends State<catalogoTutorias> {
                                 child: SizedBox(
                                   child: Row(
                                     children: [
-                                      Icon(Icons.account_tree,size: 50,color: Colors.black,),
-                                      SizedBox(width: MediaQuery.of(context).size.width-70,
+                                      SizedBox(
+                                        width: 90,
+                                        height: 90,
+                                        child: Image.network(
+                                          URL+catalogoTutorias[index]["foto"]["url"]
+                                        ),
+                                      ),
+                                      
+                                      SizedBox(width: MediaQuery.of(context).size.width-120,
                                         child: Column(
                                         crossAxisAlignment:CrossAxisAlignment.start,
                                         children: [                   
