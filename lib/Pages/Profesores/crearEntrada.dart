@@ -115,7 +115,7 @@ Future cargar_info_usuario() async{
 
 registrarEntrada() async {
   /*if(this.rol_usuario!='E'){*/
-      var url = Uri.parse(URL+"/registrarEntrada/");
+   var url = Uri.parse(URL+"/registrarEntrada/");
       //print("titulo="+tituloControlador.text+" desc="+descripcionControlador.text+" prof:"+id_usuario_profesor+" tutoria:"+id_tutoria);
   
 
@@ -133,8 +133,8 @@ registrarEntrada() async {
   else{
     print("Este Rol no puede agregar una entrada");
   }*/
-       if (this.archivosSeleccionados != null)  {  //validar que las cajas de texto tampoco sean nulas esto para crear tutoria y pra crear entrada
-      List<File> files = this.archivosSeleccionados!.paths.map((path) => File(path.toString())).toList();
+     //validar que las cajas de texto tampoco sean nulas esto para crear tutoria y pra crear entrada
+      
 
       print("--------------");
       var request = http.MultipartRequest('POST', url);
@@ -146,6 +146,8 @@ registrarEntrada() async {
       request.fields["current_user_id"]=this.id_usuario_profesor;
       
       int a=0;
+      if (this.archivosSeleccionados != null)  { 
+      List<File> files = this.archivosSeleccionados!.paths.map((path) => File(path.toString())).toList();
       for (File file in files) {
         /*print(file.name);
               print(file.bytes);
@@ -155,7 +157,7 @@ registrarEntrada() async {
         request.files.add(await http.MultipartFile.fromPath("Myarchivo"+a.toString(), file.path.toString()));
         a++;        
       }
-
+      }
       var res = await request.send()
         .then((response) {
           print(response.toString());
@@ -164,15 +166,8 @@ registrarEntrada() async {
         });
 
       print("--------------");
-
-      //print(res.body);
-
-      //print(res.reasonPharse);
-      //return res.reasonPhrase;
       return "0";
-    } else {
-      print("NO HAY NINGUN ARCHIVO SELECCIONADO"); 
-    }
+    
 
   
   

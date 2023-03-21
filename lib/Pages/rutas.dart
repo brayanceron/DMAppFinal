@@ -111,8 +111,8 @@ class _RutasState extends State<Rutas> {
                 child: const Text("Login"),
                 color: Colors.greenAccent,
                 onPressed: () {
-                  Navigator.pushNamed(context, "/login",
-                      arguments: {'nombre': 'Bra Vegueta', 'age': 25});
+                  Navigator.pushNamed(context, "/webview",
+                     );
                 }),
             MaterialButton(
                 child: const Text("homeunologin"),

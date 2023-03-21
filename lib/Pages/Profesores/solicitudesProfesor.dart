@@ -41,6 +41,41 @@ class _solicitudesProfesorState extends State<solicitudesProfesor> {
               return ListView(
                 children: [
                   Text("Solicitudes Pendientes"),
+                  //----------------------------------------------------------------
+                  Padding(
+                        padding: EdgeInsets.all(10),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            //color: Colors.red[800],
+                            gradient: LinearGradient(
+                              colors: [Colors.pink,Colors.red],
+                              begin: Alignment.topLeft, 
+                              end: Alignment.bottomRight
+                              ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.red,
+                                blurRadius: 12,
+                                offset: Offset(0, 6)
+                              )
+                            ]
+                          ),
+                          child: ListTile(
+                            title: Text("Titulo Aqui"),
+                            subtitle: Text("subtitulo Aqui"),
+                            trailing: Icon(Icons.arrow_forward_ios),
+                            leading: Icon(Icons.flutter_dash_sharp,size: 30,),
+                            //isThreeLine: true,
+                            iconColor: Colors.white,
+                            textColor: Colors.white,
+                            contentPadding: EdgeInsets.all(10.0),
+                            //tileColor: Colors.indigo,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          ),
+                        ),
+                      ),
+                  //----------------------------------------------------------------
                   ListView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
@@ -124,9 +159,17 @@ class _solicitudesProfesorState extends State<solicitudesProfesor> {
       var url = Uri.parse(URL+"/aceptarSolicitud/");
       final res = await http.post(url, body: jsonEncode({"id_solicitud": id_solicitud, "id_usuario":this.usuarioInfo[0]["_id"]["\$oid"]}));
       
-      if(res.statusCode==403 || res.statusCode==500){
+      if(res.statusCode==403 ){
         print("No tienes permisos");/*Pressentar esto en una ventana de dialogo */
-      }else{ 
+      }
+      else if(res.statusCode==500){
+         print("Hubo un error interno en el servidor");
+      }
+      else if(res.statusCode==428){
+         print("La solicitud ya no esta en estado espera");
+         recargar();
+      }
+      else{ 
         print("Accion realizada exitosamente");
         recargar();
       }
@@ -136,7 +179,7 @@ class _solicitudesProfesorState extends State<solicitudesProfesor> {
     
   }
 
-  void btnRechazar(String id_solicitud,String id_profesor_propietario_tutoria) async{
+void btnRechazar(String id_solicitud,String id_profesor_propietario_tutoria) async{
     
     print("Rechazando la solicitud "+id_solicitud);
     print("Id del usuario que inicio sesion "+this.usuarioInfo[0]["_id"]["\$oid"]);
@@ -147,9 +190,16 @@ class _solicitudesProfesorState extends State<solicitudesProfesor> {
       var url = Uri.parse(URL+"/rechazarSolicitud/");
       final res = await http.post(url, body: jsonEncode({"id_solicitud": id_solicitud, "id_usuario":this.usuarioInfo[0]["_id"]["\$oid"]}));
       
-      if(res.statusCode==403 || res.statusCode==500){
-        print("No tienes permisos");/*Pressentar esto en una ventana de dialogo */
-      }else{ 
+      if(res.statusCode==403 ){
+        print("No tiene permisos para realizar esta accion");/*Pressentar esto en una ventana de dialogo */
+      }
+      else if(res.statusCode==500){
+        print("Hubo un error interno en el servidor y no puedo completarse la accion");
+      }
+      else if(res.statusCode==428){
+        print("La solicitud ya no esta en estado espera");
+      }
+      else{ 
         print("Accion realizada exitosamente");
         recargar();
       }

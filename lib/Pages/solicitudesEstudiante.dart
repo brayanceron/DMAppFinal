@@ -43,6 +43,61 @@ class _solicitudesEstudianteState extends State<solicitudesEstudiante> {
               return ListView(
                 children: [
                   Text("Solicitudes Pendientes"),
+                  Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const CircleAvatar(
+                                radius: 25,
+                                backgroundImage: const NetworkImage("http://192.168.1.57:8000/api/media/2e33a8bd-d7e4-46a0-9371-b1ac37390455IBSJ-_-ML.jpg"),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Column(
+                            //mainAxisSize: MainAxisSize.max,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Pedro Guzman",
+                              ),
+                              
+                              Text(
+                                "Estudiante",
+                                
+                              ),
+                              Divider(color: Colors.black,)
+                            ],
+                          ),
+
+
+                          Column(
+                            children: [
+                              MaterialButton(height: 27,
+                                color: Colors.green,
+                                child: Text("Aceptar"),
+                                onPressed: (){
+                                  
+                                },),
+                              MaterialButton(height: 27,
+                                color: Colors.green,
+                                child: Text("Reach"),
+                                onPressed: (){
+                                  
+                                },)
+                            ],
+                          )
+
+
+                          
+                        ],
+                      ),
+
                   ListView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
@@ -74,13 +129,14 @@ class _solicitudesEstudianteState extends State<solicitudesEstudiante> {
                                                   child: Text("Borrar Notificacion"),
                                                   onPressed: (){
                                                     //if(this.usuarioInfo[0]["rol"]=='P'){ print("No eres estudiante");return null;}
-                                                    print("Borrar Notificacion");
+                                                    btnBorrarSolicitud(this.solicitudesEstudiante[index]["_id"]["\$oid"],this.usuarioInfo[0]["_id"]["\$oid"]);
                                                 }),
                                                 if(this.solicitudesEstudiante[index]["estado"]=="ESPERA") MaterialButton(//ESte boton debe aparecer si solamente la tutoria esta en espera
                                                   color: Colors.redAccent,
                                                   child: Text("Cancelar"),
                                                   onPressed: (){
                                                     btnCancelar(this.solicitudesEstudiante[index]["_id"]["\$oid"],this.solicitudesEstudiante[index]["id_solicitante"][0]["_id"]["\$oid"]);
+                                                    //btnCancelar(this.solicitudesEstudiante[index]["_id"]["\$oid"],this.usuarioInfo[0]["_id"]["\$oid"]);
                                                 }),
                                             ],
                                           )
@@ -123,11 +179,11 @@ class _solicitudesEstudianteState extends State<solicitudesEstudiante> {
     final res = await http.post(url, body: jsonEncode({"correo": this.user.email}));
     this.usuarioInfo = jsonDecode(res.body);
     print("ROL:"+this.usuarioInfo[0]["rol"]);
-
+    //print("ID:"+this.usuarioInfo[0]["_id"]["\$oid"]); //id del usuario
   }
 
 
-  void btnCancelar(String id_solicitud,String id_estudiante_propietario_solicitud) async{
+void btnCancelar(String id_solicitud,String id_estudiante_propietario_solicitud) async{
   print("Rechazando la solicitud"+id_solicitud);
   print("Id del usuario que inicio sesion "+this.usuarioInfo[0]["_id"]["\$oid"]);
   print("Id del estudiante dueño de la solicitud "+id_estudiante_propietario_solicitud);
@@ -137,9 +193,17 @@ class _solicitudesEstudianteState extends State<solicitudesEstudiante> {
       var url = Uri.parse(URL+"/cancelarSolicitud/");
       final res = await http.post(url, body: jsonEncode({"id_solicitud": id_solicitud, "id_usuario":this.usuarioInfo[0]["_id"]["\$oid"]}));
       
-      if(res.statusCode==403 || res.statusCode==500){
+      if(res.statusCode==403){
         print("No tienes permisos");
-      }else{ 
+      }
+      else if(res.statusCode==500){
+        print("Ha ocurrido un error interno en el servidor");
+      }
+      else if(res.statusCode==428){
+        print("La solicitud ya no esta en espera");
+        recargar();
+      }
+      else{ 
         print("Accion realizada exitosamente");
         recargar();
       }
@@ -151,6 +215,23 @@ class _solicitudesEstudianteState extends State<solicitudesEstudiante> {
 }
 
 
+
+void btnBorrarSolicitud(String id_solicitud,String id_current_user) async {
+    print("Borrar...");
+    var url = Uri.parse(URL+"/borrarSolicitud/");
+      final res = await http.post(url, body: jsonEncode({"id_solicitud": id_solicitud, "id_usuario":id_current_user}));
+      
+      if(res.statusCode==403){
+        print("No tienes permisos");
+      }
+      else if(res.statusCode==500){
+        print("Ha ocurrido un error interno en el servidor");
+      }
+      else{ 
+        print("Accion borrar notificacion realizada exitosamente");
+        recargar();
+      }
+ }
 
 
   void recargar(){

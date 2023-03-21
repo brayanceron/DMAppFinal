@@ -2,6 +2,7 @@ import 'package:appfinal/Pages/Profesores/crearEntrada.dart';
 import 'package:appfinal/Pages/Profesores/crearTutoria.dart';
 import 'package:appfinal/Pages/Profesores/solicitudesProfesor.dart';
 import 'package:appfinal/Pages/chat.dart';
+import 'package:appfinal/myWebView.dart';
 import 'Pages/Profesores/editarEntrada.dart';
 import 'package:appfinal/Pages/catalogoTutorias.dart';
 import 'package:appfinal/Pages/detalleTutoria.dart';
@@ -66,6 +67,7 @@ class MyApp extends StatelessWidget {
         '/login':(context) => login(),
         '/homeunologin':(context) => homeuno(),
         '/homedoslogin':(context) => homedoslogin(),
+        '/webview':(context) => myWebView(),
       },
 
     );

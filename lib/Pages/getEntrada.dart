@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
+        
+//import 'dart:html' as html;
+//import 'package:html/dom.dart';
+//import 'package:html' as html;
+
+
 
 import '../utilidades/utilidades.dart';
 
@@ -55,14 +61,36 @@ class _getEntradaState extends State<getEntrada> {
                   SizedBox(height: 20,),
                   Text(entrada[0]["descripcion"]),
                   SizedBox(height: 20,),
-                  Text("Contenido Adjunto:"),
-                 
+                                   
                   if(this.rol_usuario!="E") IconButton(alignment: Alignment.bottomLeft,
                                icon: Icon(Icons.edit_note,size: 30,color: Colors.redAccent),
                               onPressed: () {
                                 Navigator.pushNamed(context, "/editarEntrada",
                                 arguments: {'id_tutoria':this.id_tutoria,'id_entrada':this.id_entrada});
                               },
+                  ),
+
+                  Text("Contenido Adjunto:"),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    scrollDirection: Axis.vertical,
+                    itemCount: this.entrada[0]["archivos"].length,
+                    itemBuilder:(context, index) {
+                      return Column(
+                        children: [
+                          Text("archivo: "+this.entrada[0]["archivos"][index]["nombre"].toString()),
+                          Text("url: "+this.entrada[0]["archivos"][index]["url"].toString()),
+                          Text("exten: "+this.entrada[0]["archivos"][index]["nombre"].toString()),
+                          MaterialButton(
+                            color: Colors.blue,
+                            child: Text("Descacargar"),
+                            onPressed: (){btnDescargar(this.entrada[0]["archivos"][index]["url"]);}),
+                          Text("-------------------------------------------")
+                        ],
+                      );
+                      
+                    }
                   ),
                 ],
               );
@@ -95,6 +123,8 @@ class _getEntradaState extends State<getEntrada> {
 
     print("nueva forma" + datarecived.toString());
     this.entrada = jsonDecode(res.body);
+    print("*** Entrada ***");
+    print(this.entrada.toString());
     return datarecived;
   }
 
@@ -106,5 +136,9 @@ Future cargar_info_usuario() async{
 
   }
 
+
+void btnDescargar(String url) async {
+  print("ok: "+SERVER_URL+url);
+}
 
 }
