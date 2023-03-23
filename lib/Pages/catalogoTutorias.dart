@@ -37,49 +37,43 @@ class _catalogoTutoriasState extends State<catalogoTutorias> {
 
   @override
   Widget build(BuildContext context) {
+    String space="                         ";
     return Scaffold(
-      appBar:AppBar(title: Text("Catalogo de tutorias")) ,
+      //appBar:AppBar(title: Text("Catalogo de tutorias")) ,
       body: FutureBuilder(
         future: cargar_informacion(),
         builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
+            /*if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } 
             else if (snapshot.connectionState == ConnectionState.none) {
               return const Text("error");
-            } 
-            else{
+            } */
+            if(snapshot.data==null){
+              if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+              } 
+              else if (snapshot.connectionState == ConnectionState.none) {
+                return Center(child: const Text("Error de conexión, intentelo nuevamente"));
+              }
+              else{
+                return Center(child: const Text("Error de conexión, intentelo nuevamente"));
+              }
+            }
+            else {
+             try{
               return ListView(
                 children: [
                   
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: TextField(
-                          decoration:  InputDecoration(  
-                            contentPadding: EdgeInsets.symmetric(vertical: 15.0),                         
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                              borderSide: BorderSide(width: 0.8)
-                            ),
-                            hintText: "Buscar tutoria",                            
-                            prefixIcon: Icon(Icons.search, size: 30,),
-                            suffixIcon: IconButton(icon: Icon(Icons.clear),
-                            onPressed: (() {
-                              
-                            })
-                          ),
-                        ),
-                  )),
+                 barraBusqueda(),
+                 Text("Tutorías Disponibles",style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
                  
-                  MaterialButton(
-                    color: Colors.blueAccent,
-                    child: Text("Unirme"),
-                    onPressed: (){btnUnirme(context);}),
-                  Row(children: [cardTutoria(),cardTutoria(),],),
+                  //Row(children: [cardTutoria(),cardTutoria(),],),
                   
-                  Text("Tutorias Disponibles"),
+                  
 
                   //--------------################################################################
+                  /*
                   ListView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
@@ -139,13 +133,15 @@ class _catalogoTutoriasState extends State<catalogoTutorias> {
                     },
                     
                     ),
+                  */
                   //--------------################################################################
                   GridView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
                     scrollDirection: Axis.vertical,
                     //itemCount: tutoria[index]["archivos"].length,
-                    itemCount: 5,
+                    //itemCount: 6,
+                    itemCount: this.catalogoTutorias.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,childAspectRatio: (185 / 310)),
                     itemBuilder: (context, index) {
                         return 
@@ -175,7 +171,11 @@ class _catalogoTutoriasState extends State<catalogoTutorias> {
                                     Container(
                                       child: Image.network(URL+catalogoTutorias[index]["foto"]["url"],height: 150,),
                                     ),
-                                    Text((catalogoTutorias[index]["nombre"].toString()+"             ").substring(0,25)+"...",
+                                    Text(
+                                      catalogoTutorias[index]["nombre"].toString().length>40?
+                                    (catalogoTutorias[index]["nombre"].toString()).substring(0,36)+"...":
+                                    (catalogoTutorias[index]["nombre"].toString()).substring(0,catalogoTutorias[index]["nombre"].toString().length),
+                                    
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold),),
@@ -210,13 +210,22 @@ class _catalogoTutoriasState extends State<catalogoTutorias> {
                                       size: 28,)
                                     ],
                                   ),
-                                  
+                                  if(this.usuarioInfo[0]["rol"]=='E')
                                   MaterialButton(
                                     height: 15,
                                     minWidth: double.infinity,
                                     color: Colors.red,
                                     child: Text("Inscribir",style: TextStyle(fontSize: 18,color: Colors.white,fontWeight: FontWeight.bold)),
-                                    onPressed: (){btnInscribir(catalogoTutorias[index]["_id"]["\$oid"],catalogoTutorias[index]["id_profesor"][0]["_id"]["\$oid"]);}),
+                                    onPressed: (){
+                                      //try{
+                                        btnInscribir(catalogoTutorias[index]["_id"]["\$oid"],catalogoTutorias[index]["id_profesor"][0]["_id"]["\$oid"]);
+                                      /*}
+                                      catch(e){
+                                        exepcionDialogo(context,);
+                                      }*/
+                                      
+                                      
+                                      }),
                                   
                                   ],
                                 ),
@@ -227,12 +236,30 @@ class _catalogoTutoriasState extends State<catalogoTutorias> {
                       
                     },                      
                     
-                    )
+                    ),
 
-
+                  if(this.usuarioInfo[0]["rol"]=="E")
+                   MaterialButton(
+                    color: Colors.blueAccent,
+                    child: Text("Unirme"),
+                    onPressed: (){
+                      try{btnUnirme(context);}
+                      catch(e){exepcionDialogo(context,);}
+                      
+                      
+                      }),
                 ],
               );
+             }
+             catch(e){
+              exepcionDialogo(context);
+              return const Text("error");
+             }
             }
+            /*
+            else{                
+                return const Text("error");
+              }*/
         },
         ),
       bottomNavigationBar: myBottomNavigationBar(email: this.user.email.toString(),opcionActual: 0,)
@@ -242,8 +269,8 @@ class _catalogoTutoriasState extends State<catalogoTutorias> {
  
  
   Future cargar_informacion() async {
- 
-    await cargar_info_usuario();
+    try{
+      await cargar_info_usuario();
  
     var url = Uri.parse(URL+"/getCatalogoTutorias/");
     final res = await http.get(url);
@@ -252,7 +279,14 @@ class _catalogoTutoriasState extends State<catalogoTutorias> {
 
     print("****CATALOGO DE TUTORIAS*****\n" + datarecived.toString());
     this.catalogoTutorias = jsonDecode(res.body);
+    print("cantidad tutos: "+this.catalogoTutorias.length.toString());
     return datarecived;
+    }
+    catch(e){
+      exepcionDialogo(context);
+      return null;
+    }
+    
 
   }
 
@@ -271,23 +305,27 @@ class _catalogoTutoriasState extends State<catalogoTutorias> {
     //print("id tutoria publicada: "+id_tutorira_publicada);
     //print("id profesor: "+id_profesor);
     //print("inscribiendo...");
-
-    var url = Uri.parse(URL+"/registrarSolicitud/");
-    final res = await http.post(url, body: jsonEncode({
-        "id_tutoria_publicada": id_tutorira_publicada, 
-        "id_solicitante":this.usuarioInfo[0]["_id"]["\$oid"],
-        "id_profesor": id_profesor
-        }));
-      
-    if(res.statusCode==200){
-      print("Accion realizada exitosamente");
-      
-    }else{ 
-      print("Se presento un problema, no se pudo registrar la solicitud");/*Pressentar esto en una ventana de dialogo */
+    try{
+      var url = Uri.parse(URL+"/registrarSolicitud/");
+      final res = await http.post(url, body: jsonEncode({
+          "id_tutoria_publicada": id_tutorira_publicada, 
+          "id_solicitante":this.usuarioInfo[0]["_id"]["\$oid"],
+          "id_profesor": id_profesor
+          }));
+        
+      if(res.statusCode==200){
+        print("Accion realizada exitosamente");
+        
+      }else{ 
+        print("Se presento un problema, no se pudo registrar la solicitud");/*Pressentar esto en una ventana de dialogo */
+      }
+      Navigator.pushNamed(context, "/solicitudesEstudiante");
     }
-    Navigator.pushNamed(context, "/solicitudesEstudiante");
+    catch(e){
+      exepcionMessageDialogo(context, "Error en la conexión, no se pudo inscribir la tutoría");
+    }
 
-
+    
   }
 
   void btnUnirme(BuildContext context){
@@ -298,7 +336,7 @@ class _catalogoTutoriasState extends State<catalogoTutorias> {
   }
 
 
-  Widget unirmeDialogo(){
+Widget unirmeDialogo(){
     String unirme_totoria_resultado="";
     TextEditingController idTutoriaController=TextEditingController();
     return StatefulBuilder(
@@ -311,7 +349,7 @@ class _catalogoTutoriasState extends State<catalogoTutorias> {
                           child: TextFormField(
                               controller: idTutoriaController,
                               decoration:  InputDecoration(
-                              labelText: "Código de la tutoria",
+                              labelText: "Código de la tutoría",
                               border: OutlineInputBorder(),
                               ),
                           ),
@@ -323,19 +361,23 @@ class _catalogoTutoriasState extends State<catalogoTutorias> {
                           child: Text("Unirme"),
                           color: Colors.blueAccent,
                           onPressed: () async {
-                            String codres =await btnBuscarTutoriaId(idTutoriaController.text);
-                            print("coderes "+ codres);
-                            if(codres != "200"){
-                                setState(() {                      
-                                  unirme_totoria_resultado="Tutoria no encontrada";
-                                });
-                                
-                            }
-                            else{
-                                print("paso"); //navegar hacia el panel de la tutoria
-                                Navigator.pushNamed(context, "/panelTutoria",
-                                  arguments: {'id_tutoria': idTutoriaController.text});
-                            }
+                          try{
+                              String codres =await btnBuscarTutoriaId(idTutoriaController.text);
+                              print("coderes "+ codres);
+                              if(codres != "200"){
+                                  setState(() {                      
+                                    unirme_totoria_resultado="Tutoria no encontrada";
+                                  });
+                                  
+                              }
+                              else{
+                                  print("paso"); //navegar hacia el panel de la tutoria
+                                  Navigator.pushNamed(context, "/panelTutoria",
+                                    arguments: {'id_tutoria': idTutoriaController.text});
+                              }
+                          }
+                          catch(e){exepcionDialogo(context,);}
+
                           }
                         ),
                       ),

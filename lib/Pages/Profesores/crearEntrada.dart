@@ -48,10 +48,11 @@ class _crearEntradaState extends State<crearEntrada> {
               }
               else{
                 return ListView(
+                  
                     children: [
-                      Text("Nueva Entrada",style: TextStyle(fontSize: 40, color: Colors.black,fontWeight: FontWeight.bold)),
+                      Text("Nueva Entrada",style: TextStyle(fontSize: 40, color: Colors.black,fontWeight: FontWeight.bold) ,textAlign: TextAlign.center,),
                       SizedBox(height: 30,),
-                      Padding(padding: EdgeInsets.only(left: 15),child: Text("Titulo"),),
+                      Padding(padding: EdgeInsets.only(left: 15),child: Text("Título"),),
                       Padding(
                         padding: EdgeInsets.all(15),
                         child: TextField(
@@ -69,19 +70,23 @@ class _crearEntradaState extends State<crearEntrada> {
                           controller: descripcionControlador,
                           ),
                       ),
+                      
                       Padding(
-                        padding: EdgeInsets.all(15),
+                        padding: const EdgeInsets.only(left:15.0, right: 15.0),
+                        child: MaterialButton(
+                          child: Text("Seleccionar Archivos"),
+                          color: Colors.blueAccent,
+                          onPressed: selecionar_archivos
+                          ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left:15.0, right: 15.0),
                         child: MaterialButton(
                           child: Text("Publicar Entrada"),
                           color: Colors.blueAccent,
                           onPressed: registrarEntrada,
                         )          
-                      ),
-                      MaterialButton(
-                        child: Text("Seleccionar Archivos"),
-                        color: Colors.blueAccent,
-                        onPressed: selecionar_archivos
-                        )
+                      )
 
                     ],
                   );
@@ -134,9 +139,14 @@ registrarEntrada() async {
     print("Este Rol no puede agregar una entrada");
   }*/
      //validar que las cajas de texto tampoco sean nulas esto para crear tutoria y pra crear entrada
-      
+      if(tituloControlador.text=="" || tituloControlador.text==null || descripcionControlador=="" || descripcionControlador==null){
+        exepcionMessageDialogo(context, "Debe llenar todos los campos");
+        return null;
+      }
 
       print("--------------");
+      
+      try{
       var request = http.MultipartRequest('POST', url);
         
       request.fields["titulo"]=tituloControlador.text;
@@ -144,6 +154,9 @@ registrarEntrada() async {
       request.fields["id_profesor"]=id_usuario_profesor;
       request.fields["descripcion"]=descripcionControlador.text;
       request.fields["current_user_id"]=this.id_usuario_profesor;
+
+      
+
       
       int a=0;
       if (this.archivosSeleccionados != null)  { 
@@ -161,13 +174,16 @@ registrarEntrada() async {
       var res = await request.send()
         .then((response) {
           print(response.toString());
-          if (response.statusCode == 200) {print('Uploaded!');Navigator.pushNamed(context, "/panelTutoria",arguments: {'id_tutoria':this.id_tutoria});};
-          
+          //if (response.statusCode == 200) {print('Uploaded!');Navigator.popAndPushNamed(context, "/panelTutoria",arguments: {'id_tutoria':this.id_tutoria});};
+          if (response.statusCode == 200) {print('Uploaded!');Navigator.popAndPushNamed(context, "/panelTutoria",arguments: {'id_tutoria':this.id_tutoria});};
         });
 
       print("--------------");
       return "0";
-    
+      }
+      catch(e){
+        exepcionMessageDialogo(context, "No se pudo completar la operación");
+      }
 
   
   

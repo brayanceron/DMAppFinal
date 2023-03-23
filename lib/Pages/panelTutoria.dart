@@ -45,23 +45,29 @@ class _panelTutoriaState extends State<panelTutoria> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: 
-      AppBar(title:  const Text("Panel principal tutoria "),),
+      AppBar(title:  const Text("Panel principal tutoría "),),
 
       body: FutureBuilder(
           future: cargar_informacion(),
           builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
+              if(snapshot.data==null){
+                if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
-              } 
-              else if (snapshot.connectionState == ConnectionState.none) {
-                return const Text("error");
+                } 
+                else if (snapshot.connectionState == ConnectionState.none) {
+                  return Center(child: const Text("Error de conexión, intentelo nuevamente"));
+                }
+                else{
+                  return Center(child: const Text("Error de conexión, intentelo nuevamente"));
+                }
               }
               else{
+                try{
                   return ListView(
                           children: [
                             //Text(tutoria[0]["nombre"].toString(),style:  const TextStyle(fontSize: 40,color: Colors.black,fontWeight: FontWeight.bold)),
                             //Text(tutoria[0]["id_tutoria"][0]["nombre"].toString(),style:  const TextStyle(fontSize: 40,color: Colors.black,fontWeight: FontWeight.bold)),
-                            Text(infotutoria[0]["nombre"].toString(),style:  const TextStyle(fontSize: 30,color: Colors.black,fontWeight: FontWeight.bold)),
+                            Text(infotutoria[0]["nombre"].toString(),style:  const TextStyle(fontSize: 30,color: Colors.black,fontWeight: FontWeight.bold),textAlign: TextAlign.center,),
                             Row(
                               children: [
                                 Text("Compartir:  "+infotutoria[0]["_id"]["\$oid"].toString()),
@@ -76,7 +82,7 @@ class _panelTutoriaState extends State<panelTutoria> {
                             Row(
                               children: [
                                 IconButton(alignment: Alignment.bottomLeft,
-                                    icon: const Icon(Icons.add_box,size: 30,color: Colors.blueAccent),
+                                    icon: const Icon(Icons.people_alt,size: 30,color: Colors.blueAccent),
                                     onPressed: () {
                                       Navigator.pushNamed(context, "/detalleTutoria", 
                                       arguments: {'id_tutoria': id_tutoria,'id_usuario':id_usuario,'rol_usuario':rol_usuario});
@@ -203,16 +209,18 @@ class _panelTutoriaState extends State<panelTutoria> {
                                                   leading: CircleAvatar(
                                                     radius: 20.0,
                                                     backgroundColor: Colors.blue,
+                                                    backgroundImage: NetworkImage(URL+tutoria[index]["id_profesor"][0]["foto"]["url"]),
                                                   ),
-                                                  title: Text("Titulo Aqui",style: TextStyle(fontWeight: FontWeight.bold),),
-                                                  subtitle:Row(children: [ Text("subtitulo Aqui"),Icon(Icons.timelapse)],),
+                                                  title: Text(tutoria[index]["id_profesor"][0]["nombre"],style: TextStyle(fontWeight: FontWeight.bold),),
+                                                  subtitle:Row(children: [ Text(tutoria[index]["fecha_creacion"]),Icon(Icons.timelapse)],),
                                                   trailing: Icon(Icons.more_horiz),
                                                   contentPadding: EdgeInsets.all(0.0),
                                                 ),
                                                 Container(
                                                   width: MediaQuery.of(context).size.width,
-                                                  child: Text("Texto Descripcion aquí"),
+                                                  child: Text(tutoria[index]["descripcion"].toString()),
                                                 ),
+                                                SizedBox(height: 6,),
                                                 if(tutoria[index]["archivos"].length>0 && existeMultimedia(tutoria[index]["archivos"]))
                                                 Container(
                                                   width: double.infinity,                                                  
@@ -235,19 +243,19 @@ class _panelTutoriaState extends State<panelTutoria> {
 
 
                                                 ),
-                                                Container(
+                                                /*Container(
                                                   width: MediaQuery.of(context).size.width,
                                                   child: Text("www.udenar.ml"),
-                                                ),
+                                                ),*/
                                                 Container(
                                                   width: MediaQuery.of(context).size.width,
-                                                  child: Text("newsHeader", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),),
+                                                  child: Text("Title: "+tutoria[index]["titulo"].toString(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),),
                                                 ),
                                                 Container(
                                                   child: Row(
                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: <Widget>[
-                                                      Row(
+                                                      /*Row(
                                                         
                                                         children: <Widget>[
                                                           Icon(Icons.thumb_up,size: 16.0,color: Colors.blue),
@@ -256,12 +264,13 @@ class _panelTutoriaState extends State<panelTutoria> {
                                                           SizedBox(width: 5.0),
                                                           Text("11111")
                                                       ],
-                                                      ),
+                                                      ),*/
                                                       Row(
                                                         children: <Widget>[
-                                                          Text("0 Comentarios"),
+                                                          Text("Archivos: "+tutoria[index]["archivos"].length.toString()),
                                                           SizedBox(width: 10.0,),
-                                                          Text("0 shared")
+                                                          //Text("0 shared"),
+                                                          Text(" Comments: 0"),
                                                         ],
                                                       ),
                                                       Divider(),
@@ -281,6 +290,11 @@ class _panelTutoriaState extends State<panelTutoria> {
                             
                           ],
                         );
+                }
+                catch(e){
+                  exepcionDialogo(context);
+                  return const Text("error");
+                }
               }
             
           },
@@ -292,35 +306,42 @@ class _panelTutoriaState extends State<panelTutoria> {
 
 
   Future cargar_informacion() async {
-    argumentosRecividos = (ModalRoute.of(context)?.settings.arguments) as Map;
-    await cargar_info_usuario();
 
-    this.id_tutoria = argumentosRecividos["id_tutoria"].toString();
-    this.id_usuario = this.usuarioInfo[0]["_id"]["\$oid"] ;
-    this.rol_usuario = this.usuarioInfo[0]["rol"];
-    
-    print("ooooo--->" + id_tutoria);
+    try{
+      argumentosRecividos = (ModalRoute.of(context)?.settings.arguments) as Map;
+      await cargar_info_usuario();
+
+      this.id_tutoria = argumentosRecividos["id_tutoria"].toString();
+      this.id_usuario = this.usuarioInfo[0]["_id"]["\$oid"] ;
+      this.rol_usuario = this.usuarioInfo[0]["rol"];
+      
+      print("ooooo--->" + id_tutoria);
 
 
 
-    //Obteniendo las entradas de la tutoria
-    var url = Uri.parse(URL+"/getContenidoTutoria/");
+      //Obteniendo las entradas de la tutoria
+      var url = Uri.parse(URL+"/getContenidoTutoria/");
 
-    final res = await http.post(url, body: jsonEncode({"id_tutoria": this.id_tutoria,"current_user_id":this.id_usuario}));
-    var datarecived = jsonDecode(res.body);
+      final res = await http.post(url, body: jsonEncode({"id_tutoria": this.id_tutoria,"current_user_id":this.id_usuario}));
+      var datarecived = jsonDecode(res.body);
 
-    print("Entradas tutoria" + datarecived.toString());
-    this.tutoria = jsonDecode(res.body);
-    //return datarecived;
-    //Obteniendo la informacion de la tutoria---------------------
-    var url2 = Uri.parse(URL+"/getTutoria/");
+      print("Entradas tutoria" + datarecived.toString());
+      this.tutoria = jsonDecode(res.body);
+      //return datarecived;
+      //Obteniendo la informacion de la tutoria---------------------
+      var url2 = Uri.parse(URL+"/getTutoria/");
 
-    final res2 = await http.post(url2, body: jsonEncode({"id_tutoria": this.id_tutoria}));
-    var datarecived2 = jsonDecode(res2.body);
+      final res2 = await http.post(url2, body: jsonEncode({"id_tutoria": this.id_tutoria}));
+      var datarecived2 = jsonDecode(res2.body);
 
-    print("nueva forma" + datarecived2.toString());
-    this.infotutoria = jsonDecode(res2.body);
-
+      print("nueva forma" + datarecived2.toString());
+      this.infotutoria = jsonDecode(res2.body);
+      return datarecived2;
+    }
+    catch(e){
+      exepcionDialogo(context);
+      return null;
+    }
   }
 
   Future cargar_info_usuario() async{
@@ -330,6 +351,8 @@ class _panelTutoriaState extends State<panelTutoria> {
     print("ROL:"+this.usuarioInfo[0]["rol"]);
 
   }
+
+
 
 int calcularFilasImagenes(int numimg){
   return 6;

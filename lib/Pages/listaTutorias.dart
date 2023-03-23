@@ -35,84 +35,98 @@ class _listaTutoriasState extends State<listaTutorias> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Lista de Mis Tutorias ")),
-      body: FutureBuilder(
-        future: cargar_informacion(),
-        builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } 
-            else if (snapshot.connectionState == ConnectionState.none) {
-              return const Text("error");
-            } 
-            else{
-              return Column(
-                //shrinkWrap: true,                        
-                //physics: BouncingScrollPhysics(),
-                //scrollDirection: Axis.vertical,
-                
-                  children: [                      
-                     //-----------------------------------------------------------------------------------------------------
-                      Text("Todas las Tutorías:"),
-                       
-                      //-----------------------------------------------------------------------------------------------------                      
-                      //-----------------------------------------------------------------------------------------------------
-                      if(this.rol_usuario!="E")
-                      MaterialButton(
-                        child: const Text("Crear Tutoria"),
-                        color: Colors.pink,
-                        onPressed: () {
-                            if(this.usuarioInfo[0]["rol"]!='P'){ return null;}
-                            Navigator.pushNamed(context, "/crearTutoria",
-                                arguments: {'id_usuario':this.id_usuario,'rol_usuario':this.rol_usuario});
-                          },
-                      ),
-                      //-----------------------------------------------------------------------------------------------------
-                      
-                      //-----------------------------------------------------------------------------------------------------
-                      DefaultTabController(length: this.rol_usuario=="E"?2:3, 
-                      child: Column(
-                        //shrinkWrap: true,                        
-                        //physics: BouncingScrollPhysics(),
-                        //scrollDirection: Axis.vertical,
-                        children:  [
-                          TabBar(
-                            indicatorColor: Colors.red,
-                            labelColor: Colors.black,
-                            unselectedLabelColor: Colors.grey,
-                            tabs: [
-                              Tab(text:  this.rol_usuario=="E"?"En progreso":"Impartidas",icon: Icon(Icons.access_time)),
-                              if(this.rol_usuario=="P")Tab(text: "Publicadas",icon: Icon(Icons.public)),
-                              Tab(text: "Hisorial",icon: Icon(Icons.manage_history )),
-                              ]
-                          ),
-                          
-                          Container(
-                            height: 500,
-                            child: TabBarView(
-                            children: [
-                                this.rol_usuario=="E"? TutoriasEstudiante(): TutoriasProfesor(),
-                                if(this.rol_usuario=="P")TutoriasPublicadas(),
-                                TutoriasHistorial(),
-                            ]                            
-                            ),
-                          ),
-
-                           
-                          
-                          
-                        ],
-                      )
-                      
-                      )
-                      
-                  ],
-              );
-              
-            }
-
-        },
       
+      body: SafeArea(
+        child: FutureBuilder(
+          future: cargar_informacion(),
+          builder: (context, snapshot) {
+              
+              if(snapshot.data==null){
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                  } 
+                  else if (snapshot.connectionState == ConnectionState.none) {
+                    return Center(child: const Text("Error de conexión, intentelo nuevamente"));
+                  }
+                  else{
+                    return Center(child: const Text("Error de conexión, intentelo nuevamente"));
+                  }
+                }
+              else{
+                try{               
+                return Column(
+                  //shrinkWrap: true,                        
+                  //physics: BouncingScrollPhysics(),
+                  //scrollDirection: Axis.vertical,
+                  
+                    children: [                      
+                       //-----------------------------------------------------------------------------------------------------
+                        
+                        barraBusqueda(),
+                        Text("Mis Tutorías",style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold),),
+                        //-----------------------------------------------------------------------------------------------------                      
+                        //-----------------------------------------------------------------------------------------------------
+                        if(this.rol_usuario!="E")
+                        MaterialButton(
+                          child: const Text("Crear Tutoría"),
+                          color: Colors.pink,
+                          onPressed: () {
+                              if(this.usuarioInfo[0]["rol"]!='P'){ return null;}
+                              Navigator.pushNamed(context, "/crearTutoria",
+                                  arguments: {'id_usuario':this.id_usuario,'rol_usuario':this.rol_usuario});
+                            },
+                        ),
+                        //-----------------------------------------------------------------------------------------------------
+                        
+                        //-----------------------------------------------------------------------------------------------------
+                        DefaultTabController(length: this.rol_usuario=="E"?2:3, 
+                        child: Column(
+                          //shrinkWrap: true,                        
+                          //physics: BouncingScrollPhysics(),
+                          //scrollDirection: Axis.vertical,
+                          children:  [
+                            TabBar(
+                              indicatorColor: Colors.red,
+                              labelColor: Colors.black,
+                              unselectedLabelColor: Colors.grey,
+                              tabs: [
+                                Tab(text:  this.rol_usuario=="E"?"En progreso":"En progreso",icon: Icon(Icons.access_time)),
+                                if(this.rol_usuario=="P")Tab(text: "Publicadas",icon: Icon(Icons.public)),
+                                Tab(text: "Hisorial",icon: Icon(Icons.manage_history )),
+                                ]
+                            ),
+                            
+                            Container(
+                              height: 250,
+                              child: TabBarView(
+                              children: [
+                                  this.rol_usuario=="E"? TutoriasEstudiante(): TutoriasProfesor(),
+                                  if(this.rol_usuario=="P")TutoriasPublicadas(),
+                                  TutoriasHistorial(),
+                              ]                            
+                              ),
+                            ),
+      
+                             
+                            
+                            
+                          ],
+                        )
+                        
+                        )
+                        
+                    ],
+                );
+                }
+                catch(e){
+                  exepcionDialogo(context);
+                  return const Text("error");
+                }
+              }
+      
+          },
+        
+        ),
       ),
       bottomNavigationBar:  myBottomNavigationBar(email: this.user.email.toString(),opcionActual: 1,),
       //floatingActionButton: FloatingActionButton(onPressed: (){print("ok");}),
@@ -123,6 +137,9 @@ class _listaTutoriasState extends State<listaTutorias> {
 
 
   Future cargar_informacion() async {
+
+    try{
+      
     //argumentosRecividos = (ModalRoute.of(context)?.settings.arguments) as Map;
     await cargar_info_usuario();
     //this.rol_usuario = argumentosRecividos["rol_usuario"].toString();
@@ -151,10 +168,20 @@ class _listaTutoriasState extends State<listaTutorias> {
     var url2 = Uri.parse(URL+"/getMisTutoriasPublicadas/");
     final res2 = await http.post(url2, body: jsonEncode({"correo": this.user.email}));
     var datarecived2 = jsonDecode(res2.body);
-
+    
     print("TUTORIAS PUBLICADAS **** " + datarecived2.toString());
     this.tutoriasPublicadas = jsonDecode(res2.body);
     return datarecived2;
+    }
+    catch(e){
+      exepcionDialogo(context);
+      return null;
+    }
+
+
+
+
+
   }
 
   Future cargar_info_usuario() async{
@@ -168,6 +195,12 @@ class _listaTutoriasState extends State<listaTutorias> {
     this.rol_usuario = this.usuarioInfo[0]["rol"];
 
   }
+
+ 
+
+
+
+
 
  
 Widget TutoriasEstudiante(){

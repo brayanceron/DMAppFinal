@@ -34,12 +34,12 @@ class _crearTutoriaState extends State<crearTutoria> {
     print("usuario: "+this.id_usuario);
 
      return Scaffold(
-      appBar: AppBar(title: Text("Crear Tutoria"),),
+      appBar: AppBar(title: Text("Crear Tutoría"),),
       body:  ListView(
         children:   [
-          Text("Nueva tutoria",style: TextStyle(fontSize: 40, color: Colors.black,fontWeight: FontWeight.bold)),
+          Text("Nueva tutoría",style: TextStyle(fontSize: 40, color: Colors.black,fontWeight: FontWeight.bold)),
           SizedBox(height: 30,),
-          Padding(padding: EdgeInsets.only(left: 15),child: Text("Nombre de la tutoria"),),
+          Padding(padding: EdgeInsets.only(left: 15),child: Text("Nombre de la tutoría"),),
           Padding(
             padding: EdgeInsets.all(15),
             child: TextField(
@@ -47,7 +47,7 @@ class _crearTutoriaState extends State<crearTutoria> {
               controller: nombre,
               ),
           ),
-          Padding(padding: EdgeInsets.only(left: 15),child: Text("Descripción de la tutoria"),),
+          Padding(padding: EdgeInsets.only(left: 15),child: Text("Descripción de la tutoría"),),
           Padding(
             padding: EdgeInsets.all(15),
             child: TextField(
@@ -58,19 +58,24 @@ class _crearTutoriaState extends State<crearTutoria> {
               ),
           ),
           
+          Padding(
+            padding: const EdgeInsets.only(left:15.0,right: 15.0),
+            child: MaterialButton(
+                    child: Text("Selección Archivo"),
+                    color: Colors.blueAccent,
+                    onPressed: selecionar_archivos
+            ),
+          ),
            if(this.rol_usuario!="E") 
            Padding(
-            padding: EdgeInsets.all(15),
+            padding: EdgeInsets.only(left:15.0,right: 15.0),
             child: MaterialButton(
-              child: Text("Publicar Tutoria"),
+              child: Text("Publicar Tutoría"),
               color: Colors.blueAccent,
               onPressed: registrarTutoria,
             )          
           ),
-          MaterialButton(
-                  child: Text("Seleccion Archivo"),
-                  color: Colors.blueAccent,
-                  onPressed: selecionar_archivos)
+          
         ],
       ),
     );
@@ -85,8 +90,15 @@ selecionar_archivos() async {
 registrarTutoria() async{
   var url = Uri.parse(URL+"/publicarTutoria/");
 
+  if(nombre.text=="" || nombre.text==null || descripcion=="" || descripcion==null){
+        exepcionMessageDialogo(context, "Debe llenar todos los campos");
+        return null;
+  }
+
 
   if (this.archivosSeleccionados != null)  {  //validar que las cajas de texto tampoco sean nulas esto para crear tutoria y pra crear entrada
+     
+      try{
       List<File> files = this.archivosSeleccionados!.paths.map((path) => File(path.toString())).toList();
 
       print("--------------");
@@ -105,8 +117,8 @@ registrarTutoria() async{
         var res = await request.send()
         .then((response) {
           print(response.toString());
-          if (response.statusCode == 200) {print('Uploaded!');Navigator.pushNamed(context, "/listaTutorias");};
-          
+          //if (response.statusCode == 200) {print('Uploaded!');Navigator.pushNamed(context, "/listaTutorias");};
+          if (response.statusCode == 200) {print('Uploaded!');Navigator.popAndPushNamed(context, "/listaTutorias");};
         });
       }
       print("--------------");
@@ -116,8 +128,16 @@ registrarTutoria() async{
       //print(res.reasonPharse);
       //return res.reasonPhrase;
       return "0";
+      }
+      catch(e){
+        exepcionMessageDialogo(context, "No se pudo completar la operación");
+      }
+
+
+
     } else {
       print("NO HAY NINGUN ARCHIVO SELECCIONADO"); 
+      exepcionMessageDialogo(context, "Debe seleccionar una imagen");
     }
 
 

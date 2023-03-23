@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
+import 'catalogoTutorias.dart';
 import 'login/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -50,7 +51,28 @@ class _RutasState extends State<Rutas> {
                     return FutureBuilder(
                       future: cargar_info_usuario(),
                       builder: (context, snapshot) {
-                        return columnarutas();
+                        if(snapshot.data==null){
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                          } 
+                          else if (snapshot.connectionState == ConnectionState.none) {
+                            return Center(child: const Text("Error de conexión, intentelo nuevamente"));
+                          }
+                          else{
+                            return Center(child: const Text("Error de conexión, intentelo nuevamente"));
+                          }
+                        }
+                        else{
+                          try{
+                            //return columnarutas();
+                            return catalogoTutorias();
+                          }
+                          catch(e){
+                            exepcionDialogo(context);
+                            return const Text("error");
+                          }
+                        }
+                        
                       },
                       );
                   }
@@ -71,7 +93,6 @@ class _RutasState extends State<Rutas> {
       print("Peticion recivida: " + datarecived["atributo2"].toString());
     });
   }
-
   void peticionPost() {
     var url = Uri.parse(URL+"/rutaUno/");
     var datasend =  jsonEncode({"datos_peticion": "Brayan OK", "atributo2": "valor2"});
@@ -80,18 +101,28 @@ class _RutasState extends State<Rutas> {
     });
   }
 
-  Future cargar_info_usuario() async{
-    user = await FirebaseAuth.instance.currentUser; 
-    var url = Uri.parse(URL+"/getInfoUsuario/");
-    final res = await http.post(url, body: jsonEncode({"correo": this.user?.email}));
-    this.usuarioInfo = jsonDecode(res.body);
 
-    print("****MOVILE*****");
-    print(this.usuarioInfo);
-    //print("ROL:"+this.usuarioInfo[0]["rol"]);
-    //print("_id: "+this.usuarioInfo[0]["_id"]["\$oid"]);
-    this.id_usuario = this.usuarioInfo[0]["_id"]["\$oid"] ;
-    this.rol_usuario = this.usuarioInfo[0]["rol"];
+
+  Future cargar_info_usuario() async{
+    try{
+      user = await FirebaseAuth.instance.currentUser; 
+      var url = Uri.parse(URL+"/getInfoUsuario/");
+      final res = await http.post(url, body: jsonEncode({"correo": this.user?.email}));
+      this.usuarioInfo = jsonDecode(res.body);
+
+      print("****MOVILE*****");
+      print(this.usuarioInfo);
+      //print("ROL:"+this.usuarioInfo[0]["rol"]);
+      //print("_id: "+this.usuarioInfo[0]["_id"]["\$oid"]);
+      this.id_usuario = this.usuarioInfo[0]["_id"]["\$oid"] ;
+      this.rol_usuario = this.usuarioInfo[0]["rol"];
+      return jsonDecode(res.body);
+    }
+    catch(e){
+      exepcionDialogo(context);
+      return null;
+    }
+    
     
 
   }
@@ -108,10 +139,10 @@ class _RutasState extends State<Rutas> {
                       arguments: {'opt_actual': 0});
                 }),
             MaterialButton(
-                child: const Text("Login"),
+                child: const Text("Login/perfil"),
                 color: Colors.greenAccent,
                 onPressed: () {
-                  Navigator.pushNamed(context, "/webview",
+                  Navigator.pushNamed(context, "/myPerfil",
                      );
                 }),
             MaterialButton(

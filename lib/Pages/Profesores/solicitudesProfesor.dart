@@ -27,62 +27,112 @@ class _solicitudesProfesorState extends State<solicitudesProfesor> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Solicitudes Profesor")),
-      body: FutureBuilder(
+      //appBar: AppBar(title: const Text("Solicitudes Profesor")),
+      body: SafeArea(
+        child: FutureBuilder(
         future: cargar_informacion(),
         builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } 
-            else if (snapshot.connectionState == ConnectionState.none) {
-              return const Text("error");
-            }
+            if(snapshot.data==null){
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+                } 
+                else if (snapshot.connectionState == ConnectionState.none) {
+                  return Center(child: const Text("Error de conexión, intentelo nuevamente"));
+                }
+                else{
+                  
+                  return Center(child: const Text("Error de conexión, intentelo nuevamente"));
+                }
+              }
             else{
+              try{              
               return ListView(
                 children: [
-                  Text("Solicitudes Pendientes"),
+                  //Text("Solicitudes Pendientes"),
+                  barraBusqueda(),
+                  Text("Solicitudes Pendientes",style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                   /*
+                   Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    //color: Colors.green[700],
+                                    gradient: LinearGradient(
+                                      colors: [Colors.grey.shade50,Colors.grey.shade100],
+                                      begin: Alignment.topLeft, 
+                                      end: Alignment.bottomRight
+                                      ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.shade400,
+                                        blurRadius: 12,
+                                        offset: Offset(0, 6)
+                                      )
+                                    ]
+                                  ),
+                                  child: ListTile(
+                                    title: Text("Solicitud",style: TextStyle(fontWeight: FontWeight.bold)),
+                                    subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text("El estudiante XXXX ha pedido uniser a la tutoria YYYY",style: TextStyle(fontSize: 13),),
+                                        Text("Estado: Espera",style: TextStyle(fontSize: 10,)),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.all(2.0),
+                                              child: MaterialButton(height: 27, 
+                                                color: Colors.black,
+                                                child: Text("Aceptar",style: TextStyle(color: Colors.white)),
+                                                onPressed: (){
+                                                  
+                                                },),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.all(2.0),
+                                              child: MaterialButton(height: 27,
+                                                color: Colors.black,
+                                                child: Text("Reach",style: TextStyle(color: Colors.white),),
+                                                onPressed: (){
+                                                  
+                                                },),
+                                            )
+      
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    trailing: Icon(Icons.flutter_dash_sharp,size: 30),
+                                    leading: CircleAvatar(
+                                              radius: 20.0,
+                                              backgroundColor: Colors.blue,
+                                              backgroundImage: NetworkImage("http://192.168.1.57:8000/api/media/2e33a8bd-d7e4-46a0-9371-b1ac37390455IBSJ-_-ML.jpg"),
+                                              ) /*Icon(Icons.flutter_dash_sharp,size: 30,)*/,
+                                    //isThreeLine: true,
+                                    iconColor: Colors.black,
+                                    textColor: Colors.black,
+                                    contentPadding: EdgeInsets.all(10.0),
+                                    //tileColor: Colors.indigo,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                    
+                                    onTap: () {
+                                      
+                                    },
+                                  ),
+                                ),
+                              ), 
+                    */
                   //----------------------------------------------------------------
-                  Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            //color: Colors.red[800],
-                            gradient: LinearGradient(
-                              colors: [Colors.pink,Colors.red],
-                              begin: Alignment.topLeft, 
-                              end: Alignment.bottomRight
-                              ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.red,
-                                blurRadius: 12,
-                                offset: Offset(0, 6)
-                              )
-                            ]
-                          ),
-                          child: ListTile(
-                            title: Text("Titulo Aqui"),
-                            subtitle: Text("subtitulo Aqui"),
-                            trailing: Icon(Icons.arrow_forward_ios),
-                            leading: Icon(Icons.flutter_dash_sharp,size: 30,),
-                            //isThreeLine: true,
-                            iconColor: Colors.white,
-                            textColor: Colors.white,
-                            contentPadding: EdgeInsets.all(10.0),
-                            //tileColor: Colors.indigo,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                          ),
-                        ),
-                      ),
-                  //----------------------------------------------------------------
+                 
+                 //----------------------------------------------------------------
                   ListView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
                     scrollDirection: Axis.vertical,
                     itemCount: solicitudesProfesor.length,
                     itemBuilder: (context, index) {
-                      return InkWell(
+                      return /*InkWell(
                               onTap: () {                                
                                 /*Navigator.pushNamed(context, "/panelTutoria",
                                   arguments: {'id_tutoria': this.tutoriasEnProgresoProfesor[index]["_id"]['\$oid']}
@@ -134,15 +184,98 @@ class _solicitudesProfesorState extends State<solicitudesProfesor> {
                             
                                 ),
                               ),
-                            );
+                            );*/
+
+                            Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    //color: Colors.green[700],
+                                    gradient: LinearGradient(
+                                      colors: [Colors.grey.shade50,Colors.grey.shade100],
+                                      begin: Alignment.topLeft, 
+                                      end: Alignment.bottomRight
+                                      ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.shade400,
+                                        blurRadius: 12,
+                                        offset: Offset(0, 6)
+                                      )
+                                    ]
+                                  ),
+                                  child: ListTile(
+                                    title: Text("Solicitud",style: TextStyle(fontWeight: FontWeight.bold)),
+                                    subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('El estudiante '+this.solicitudesProfesor[index]["id_solicitante"][0]["nombre"]+' ha pedido uniser a la tutoría "'+
+                                        this.solicitudesProfesor[index]["id_tutoria_publicada"][0]["nombre"]+'"',style: TextStyle(fontSize: 13),),
+                                        Text("Estado: "+this.solicitudesProfesor[index]["estado"],style: TextStyle(fontSize: 10,)),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.all(2.0),
+                                              child: MaterialButton(height: 27, 
+                                                color: Colors.black,
+                                                child: Text("Aceptar",style: TextStyle(color: Colors.white)),
+                                                onPressed: (){
+                                                  btnAceptar(this.solicitudesProfesor[index]["_id"]["\$oid"],this.solicitudesProfesor[index]["id_profesor"][0]["_id"]["\$oid"]);
+                                                },),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.all(2.0),
+                                              child: MaterialButton(height: 27,
+                                                color: Colors.black,
+                                                child: Text("Rechazar",style: TextStyle(color: Colors.white),),
+                                                onPressed: (){
+                                                   btnRechazar(this.solicitudesProfesor[index]["_id"]["\$oid"],this.solicitudesProfesor[index]["id_profesor"][0]["_id"]["\$oid"]);
+                                                },),
+                                            )
+      
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    trailing: Icon(Icons.flutter_dash_sharp,size: 30),
+                                    leading: CircleAvatar(
+                                              radius: 20.0,
+                                              backgroundColor: Colors.blue,
+                                              //backgroundImage: NetworkImage("http://192.168.1.57:8000/api/media/2e33a8bd-d7e4-46a0-9371-b1ac37390455IBSJ-_-ML.jpg"),
+                                              backgroundImage: NetworkImage(SERVER_URL+this.solicitudesProfesor[index]["id_solicitante"][0]["foto"]["url"].toString()),
+                                              
+                                              ) /*Icon(Icons.flutter_dash_sharp,size: 30,)*/,
+                                    //isThreeLine: true,
+                                    iconColor: Colors.black,
+                                    textColor: Colors.black,
+                                    contentPadding: EdgeInsets.all(10.0),
+                                    //tileColor: Colors.indigo,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                    
+                                    onTap: () {
+                                      
+                                    },
+                                  ),
+                                ),
+                              );
                           
                     },
                   ),
+                  if( solicitudesProfesor.length==0)Center(child: Text("sin solicitudes"))
                 ],
               );
+              }
+              catch(e){
+                exepcionDialogo(context);
+                return const Text("error");
+              }
             }
         },
       ),
+      
+        ),
+      
       bottomNavigationBar:  myBottomNavigationBar(email: this.user.email.toString(),opcionActual: 2,)
     );
   }
@@ -150,6 +283,7 @@ class _solicitudesProfesorState extends State<solicitudesProfesor> {
 
  void btnAceptar(String id_solicitud,String id_profesor_propietario_tutoria) async{
 
+    try{
     print("Aceptando la solicitud "+id_solicitud);
     print("Id del usuario que inicio sesion "+this.usuarioInfo[0]["_id"]["\$oid"]);
     print("Id del profesor dueño de la tutoria "+id_profesor_propietario_tutoria);
@@ -161,12 +295,15 @@ class _solicitudesProfesorState extends State<solicitudesProfesor> {
       
       if(res.statusCode==403 ){
         print("No tienes permisos");/*Pressentar esto en una ventana de dialogo */
+        exepcionMessageDialogo(context,"No tienes permisos" );
       }
       else if(res.statusCode==500){
          print("Hubo un error interno en el servidor");
+         exepcionMessageDialogo(context,"Hubo un error interno en el servidor" );
       }
       else if(res.statusCode==428){
          print("La solicitud ya no esta en estado espera");
+         exepcionMessageDialogo(context,"La solicitud ya no esta en estado espera" );
          recargar();
       }
       else{ 
@@ -175,12 +312,18 @@ class _solicitudesProfesorState extends State<solicitudesProfesor> {
       }
       
     } 
-    else{print("No eres el dueño de esta tutoria para rechazar esta solicitud");}/*Pressentar esto en una ventana de dialogo */
-    
+    else{
+      print("No eres el dueño de esta tutoria para rechazar esta solicitud");
+      exepcionMessageDialogo(context,"No eres el dueño de esta tutoría para rechazar esta solicitud");
+      }/*Pressentar esto en una ventana de dialogo */
+    }
+    catch(e){exepcionDialogo(context,);}
+
+
   }
 
 void btnRechazar(String id_solicitud,String id_profesor_propietario_tutoria) async{
-    
+    try{
     print("Rechazando la solicitud "+id_solicitud);
     print("Id del usuario que inicio sesion "+this.usuarioInfo[0]["_id"]["\$oid"]);
     print("Id del profesor dueño de la tutoria "+id_profesor_propietario_tutoria);
@@ -192,12 +335,15 @@ void btnRechazar(String id_solicitud,String id_profesor_propietario_tutoria) asy
       
       if(res.statusCode==403 ){
         print("No tiene permisos para realizar esta accion");/*Pressentar esto en una ventana de dialogo */
+        exepcionMessageDialogo(context,"No tiene permisos para realizar esta acción" );
       }
       else if(res.statusCode==500){
-        print("Hubo un error interno en el servidor y no puedo completarse la accion");
+        print("Hubo un error interno en el servidor y no puedo completarse la acción");
+        exepcionMessageDialogo(context,"Hubo un error interno en el servidor y no puedo completarse la acción" );
       }
       else if(res.statusCode==428){
         print("La solicitud ya no esta en estado espera");
+        exepcionMessageDialogo(context,"La solicitud ya no esta en estado espera" );
       }
       else{ 
         print("Accion realizada exitosamente");
@@ -205,7 +351,12 @@ void btnRechazar(String id_solicitud,String id_profesor_propietario_tutoria) asy
       }
       
     } 
-    else{print("No eres el dueño de esta tutoria para rechazar esta solicitud");}/*Pressentar esto en una ventana de dialogo */
+    else{
+      print("No eres el dueño de esta tutoria para rechazar esta solicitud");
+      exepcionMessageDialogo(context,"No eres el dueño de esta tutoría para rechazar esta solicitud");
+    }/*Pressentar esto en una ventana de dialogo */
+    }
+    catch(e){exepcionDialogo(context,);}
 
   }
 
@@ -219,8 +370,9 @@ void btnRechazar(String id_solicitud,String id_profesor_propietario_tutoria) asy
   }
 
   Future cargar_informacion() async {
- 
-    await cargar_info_usuario();
+    
+    try{
+      await cargar_info_usuario();
  
     var url = Uri.parse(URL+"/getSolicitudesProfesor/");
     final res = await http.post(url, body: jsonEncode({"correo": this.user.email}));
@@ -228,6 +380,13 @@ void btnRechazar(String id_solicitud,String id_profesor_propietario_tutoria) asy
     //var datarecived = res.body;
     print("SOLICITUDES ENCONTRADAS ****" + datarecived.toString());
     this.solicitudesProfesor = jsonDecode(res.body);
+    return datarecived;
+    }
+    catch(e){
+      exepcionDialogo(context);
+      return null;
+    }
+    
 
   }
 
